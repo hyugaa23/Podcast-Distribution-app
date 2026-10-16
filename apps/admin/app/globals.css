@@ -60,6 +60,8 @@ button, input, select, textarea { font: inherit; color: inherit; }
   .shell.nav-open .side { transform: none; }
   .menu-btn { display: inline-grid; }
   .who, .scope select { min-width: 0; }
+  .scope { min-width: 0; max-width: 100%; }
+  .scope select { max-width: 100%; }
   .who { display: none; }
   .content { padding: 16px; }
   .top { padding: 10px 12px; flex-wrap: wrap; }

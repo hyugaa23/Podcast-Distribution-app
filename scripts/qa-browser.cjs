@@ -79,7 +79,10 @@ const episode = { id: 1, podcast_id: 1, title: 'QA draft', slug: 'qa-draft', epi
       let data = [];
       if (url.pathname === '/api/auth/refresh') data = session;
       else if (url.pathname === '/api/notifications') data = { items: [], unread: 0 };
-      else if (url.pathname === '/api/tenants') data = [{ id: 1, name: 'QA first', slug: 'qa-first' }, { id: 2, name: 'QA second', slug: 'qa-second' }];
+      else if (url.pathname === '/api/tenants') data = [
+        { id: 1, name: 'QA first', slug: 'qa-first', primary_domain: 'podcastbusiness.43-156-240-174.sslip.io' },
+        { id: 2, name: 'QA second', slug: 'qa-second', primary_domain: 'editorialaudio.43-156-240-174.sslip.io' },
+      ];
       else if (url.pathname === '/api/platforms') data = [{ id: 1, name: 'QA platform', key: 'qa', submission_type: 'MANUAL', instructions: 'Copy the feed URL' }];
       else if (url.pathname === '/api/distribution/1') data = {
         platforms: [{ platform_id: 1, podcast_id: 1, platform_name: 'QA platform', status: 'NOT_STARTED' }], live: 0, total: 1, progress_percent: 0, can_manage: true,
