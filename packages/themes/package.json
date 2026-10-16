@@ -1,0 +1,4 @@
+{ "name": "@podcast/themes", "version": "1.0.0", "private": true, "main": "src/index.ts", "types": "src/index.ts",
+  "exports": { ".": "./src/index.ts", "./all.css": "./src/all.css" },
+  "dependencies": { "@podcast/types": "*", "@podcast/ui": "*", "@podcast/player": "*", "@podcast/config": "*" },
+  "peerDependencies": { "react": "^19", "next": "^16" } }

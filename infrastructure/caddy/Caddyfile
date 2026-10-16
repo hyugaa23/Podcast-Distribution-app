@@ -1,0 +1,44 @@
+# Reverse proxy / load balancer (PRD §101). Tenant domains get TLS certificates on demand; Caddy first asks
+# the API whether the hostname is a configured tenant domain (404 = refuse), which prevents certificate abuse.
+# Upstreams and the media root can be overridden through env (defaults match docker-compose.yml);
+# CADDY_GLOBAL_EXTRA=local_certs is only for testing on a local machine.
+{
+	{$CADDY_GLOBAL_EXTRA}
+	on_demand_tls {
+		ask http://{$API_UPSTREAM:api:8080}/api/public/domain-verification
+	}
+}
+
+{$ADMIN_DOMAIN} {
+	encode zstd gzip
+	reverse_proxy {$ADMIN_UPSTREAM:admin:3001}
+}
+
+{$API_DOMAIN} {
+	# Audio and images are files on the VPS disk: Caddy serves them directly (Range requests, long cache).
+	handle_path /media/* {
+		root * {$MEDIA_ROOT:/srv/media}
+		header Cache-Control "public, max-age=31536000, immutable"
+		header Access-Control-Allow-Origin *
+		file_server
+	}
+	handle {
+		encode zstd gzip
+		reverse_proxy {$API_UPSTREAM:api:8080}
+	}
+}
+
+# Every other hostname is a tenant website served by the single Next.js web app (PRD §112).
+https:// {
+	tls {
+		on_demand
+	}
+	encode zstd gzip
+	reverse_proxy {$WEB_UPSTREAM:web:3000} {
+		header_up X-Forwarded-Host {host}
+	}
+}
+
+http:// {
+	redir https://{host}{uri} permanent
+}

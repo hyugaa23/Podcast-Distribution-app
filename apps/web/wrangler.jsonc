@@ -1,0 +1,14 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  // Public multi-tenant websites (all 10 themes). Every tenant domain is routed to this one Worker.
+  "name": "podcast-web",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
+  "vars": {
+    // Public URL of the Go API (it must run on a server/VPS — Workers cannot run it).
+    "API_INTERNAL_URL": "https://api.example.com"
+  }
+  // REVALIDATE_SECRET: set with `npx wrangler secret put REVALIDATE_SECRET`
+}

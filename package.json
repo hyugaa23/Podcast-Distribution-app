@@ -1,0 +1,29 @@
+{
+  "name": "podcast-platform",
+  "private": true,
+  "description": "Multi-domain podcast publishing, streaming & distribution engine (one codebase, many domains, 10 themes).",
+  "workspaces": [
+    "apps/web",
+    "apps/admin",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:web": "npm run dev -w @podcast/web",
+    "dev:admin": "npm run dev -w @podcast/admin",
+    "build": "npm run build -w @podcast/web && npm run build -w @podcast/admin",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test:api": "cd apps/api && go test ./...",
+    "api": "cd apps/api && go run ./cmd/api",
+    "worker": "cd apps/api && go run ./cmd/worker",
+    "migrate": "cd apps/api && go run ./cmd/migrate",
+    "seed:demo": "cd apps/api && go run ./cmd/migrate -demo"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "typescript": "^5.9.3"
+  }
+}

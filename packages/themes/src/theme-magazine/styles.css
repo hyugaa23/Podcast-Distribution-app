@@ -1,0 +1,406 @@
+/* Theme 10 — Premium Magazine (prefix tz-) */
+.t-magazine {
+  --tz-gold: color-mix(in srgb, var(--c-primary) 78%, var(--c-text));
+  --tz-gold-lt: color-mix(in srgb, var(--c-primary) 62%, #fff);
+  --tz-rule: color-mix(in srgb, var(--c-text) 22%, transparent);
+  --tz-hair: color-mix(in srgb, var(--c-text) 13%, transparent);
+  --tz-soft: color-mix(in srgb, var(--c-text) 78%, var(--c-bg));
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  text-rendering: optimizeLegibility;
+}
+.t-magazine a { text-decoration: none; }
+.t-magazine :is(h1, h2, h3, h4) { font-family: var(--font-heading); font-weight: 500; }
+.t-magazine .pe-prose a { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .18em; }
+.t-magazine .tz-muted { color: var(--c-muted); }
+.t-magazine .tz-wrap { width: min(1280px, 100% - 40px); margin-inline: auto; }
+.t-magazine .tz-shell { overflow-x: clip; min-height: 100vh; display: flex; flex-direction: column; }
+.t-magazine .tz-main { flex: 1; }
+/* Shared listing pages rendered inside <main>: keep them on the magazine measure. */
+.t-magazine .tz-main > :where(:not(.tz-home, .tz-show, .tz-feature)) { width: min(1280px, 100% - 40px); margin-inline: auto; }
+.t-magazine .pe-page__title { font-size: clamp(2.4rem, 6vw, 4.6rem); font-weight: 500; line-height: 1; }
+.t-magazine .pe-section-title { font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 500; border-top: 1px solid var(--c-text); padding-top: 12px; }
+.t-magazine .pe-page__lead { font-style: italic; }
+.t-magazine .pe-chips a, .t-magazine .pe-pagination a, .t-magazine .pe-pagination span { border-radius: var(--radius); }
+
+/* Shared typographic atoms */
+.t-magazine .tz-kicker { margin: 0 0 8px; font-family: var(--font-body); font-size: .72rem; font-weight: 600; text-transform: uppercase; letter-spacing: .18em; color: var(--tz-gold); line-height: 1.4; }
+.t-magazine .tz-kicker a:hover { text-decoration: underline; text-underline-offset: .2em; }
+.t-magazine .tz-kicker--lg { font-size: .8rem; letter-spacing: .24em; }
+.t-magazine .tz-kicker__sep { color: var(--c-muted); }
+.t-magazine .tz-byline { margin: 0; font-size: .86rem; color: var(--c-muted); font-variant: small-caps; letter-spacing: .04em; }
+.t-magazine .tz-byline a { color: var(--c-text); border-bottom: 1px solid color-mix(in srgb, var(--c-primary) 55%, transparent); }
+.t-magazine .tz-byline a:hover { border-bottom-color: var(--c-text); }
+.t-magazine .tz-explicit { display: inline-block; font-style: normal; text-decoration: none; border: 1px solid currentColor; font-size: .62rem; letter-spacing: .14em; text-transform: uppercase; padding: 0 5px; line-height: 1.6; vertical-align: 1px; font-variant: normal; }
+.t-magazine .tz-h2 { font-size: clamp(1.8rem, 3vw, 2.6rem); line-height: 1.05; margin: 0 0 14px; }
+.t-magazine .tz-h3 { font-size: 1.6rem; margin: 32px 0 10px; }
+
+/* Buttons */
+.t-magazine .tz-btn,
+.t-magazine .tz-subscribe .pe-subscribe__btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 13px 26px; min-height: 46px;
+  border: 1px solid var(--c-text); border-radius: var(--radius); background: transparent; color: var(--c-text);
+  font-family: var(--font-body); font-size: .74rem; font-weight: 600; text-transform: uppercase; letter-spacing: .2em; text-decoration: none;
+  transition: background .2s ease, color .2s ease, border-color .2s ease;
+}
+.t-magazine .tz-btn:hover, .t-magazine .tz-subscribe .pe-subscribe__btn:hover { background: var(--c-text); color: var(--c-bg); filter: none; }
+.t-magazine .tz-btn--solid { background: var(--c-text); color: var(--c-bg); }
+.t-magazine .tz-btn--solid:hover { background: var(--c-primary); border-color: var(--c-primary); color: var(--c-on-primary); }
+.t-magazine .tz-btn svg { width: 16px; height: 16px; }
+.t-magazine .tz-listen { padding: 8px 0 0; font-family: var(--font-body); font-size: .72rem; text-transform: uppercase; letter-spacing: .18em; color: var(--tz-gold); background: none; }
+.t-magazine .tz-listen svg { width: 13px; height: 13px; }
+.t-magazine .tz-listen:hover { text-decoration: underline; text-underline-offset: .25em; }
+
+/* ---------- Masthead ---------- */
+.t-magazine .tz-mast { background: var(--c-bg); }
+.t-magazine .tz-mast__top { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 10px 0; border-bottom: 1px solid var(--tz-hair); }
+.t-magazine .tz-mast__issue { margin: 0; display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: .7rem; text-transform: uppercase; letter-spacing: .2em; color: var(--c-muted); }
+.t-magazine .tz-mast__tag { font-style: italic; text-transform: none; letter-spacing: .02em; font-size: .82rem; }
+.t-magazine .tz-search { width: 260px; border: 0; border-bottom: 1px solid var(--tz-rule); border-radius: 0; background: transparent; }
+.t-magazine .tz-search input { font-style: italic; font-size: .88rem; padding: 6px 4px; }
+.t-magazine .tz-mast__brand { text-align: center; padding: clamp(18px, 4vw, 44px) 0 clamp(14px, 2.4vw, 26px); }
+.t-magazine .tz-wordmark { display: inline-block; max-width: 100%; color: var(--c-text); }
+.t-magazine .tz-wordmark__text { display: block; font-family: var(--font-heading); font-weight: 500; font-size: clamp(2.2rem, 9vw, 7.6rem); line-height: .95; letter-spacing: .08em; text-transform: uppercase; overflow-wrap: anywhere; padding-left: .08em; }
+.t-magazine .tz-wordmark__logo { max-height: clamp(48px, 9vw, 120px); width: auto; margin-inline: auto; }
+.t-magazine .tz-nav { border-block: 3px double var(--c-text); }
+.t-magazine .tz-nav ul { list-style: none; margin-block: 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 0; }
+.t-magazine .tz-nav li { display: flex; align-items: center; }
+.t-magazine .tz-nav li + li::before { content: '◆'; font-size: .4rem; color: var(--tz-gold); opacity: .8; }
+.t-magazine .tz-nav a { display: block; padding: 13px clamp(10px, 1.6vw, 22px); font-size: .74rem; font-weight: 600; text-transform: uppercase; letter-spacing: .22em; }
+.t-magazine .tz-nav a:hover { color: var(--tz-gold); }
+
+/* ---------- Footer ---------- */
+.t-magazine .tz-foot { margin-top: clamp(64px, 9vw, 128px); border-top: 3px double var(--c-text); padding: clamp(36px, 5vw, 60px) 0 40px; text-align: center; }
+.t-magazine .tz-foot__mark { margin: 0; font-family: var(--font-heading); font-size: clamp(2rem, 5vw, 3.6rem); text-transform: uppercase; letter-spacing: .1em; line-height: 1; overflow-wrap: anywhere; }
+.t-magazine .tz-foot__tag { margin: 10px 0 0; font-style: italic; color: var(--c-muted); }
+.t-magazine .tz-foot__nav ul { list-style: none; padding: 0; margin: 26px 0 18px; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 26px; }
+.t-magazine .tz-foot__nav a { font-size: .72rem; text-transform: uppercase; letter-spacing: .2em; }
+.t-magazine .tz-foot__nav a:hover { color: var(--tz-gold); }
+.t-magazine .tz-foot__social { justify-content: center; font-style: italic; }
+.t-magazine .tz-foot__legal { margin: 22px 0 0; padding-top: 18px; border-top: 1px solid var(--tz-hair); font-size: .78rem; color: var(--c-muted); }
+
+/* ---------- Section heads ---------- */
+.t-magazine .tz-section { padding-top: clamp(48px, 7vw, 96px); }
+.t-magazine .tz-shead { text-align: center; border-top: 3px double var(--c-text); padding-top: 22px; margin-bottom: clamp(26px, 4vw, 48px); }
+.t-magazine .tz-shead__title { margin: 0; font-size: clamp(2rem, 4.8vw, 3.8rem); line-height: 1.02; letter-spacing: -.005em; }
+.t-magazine .tz-shead__sub { margin: 8px 0 0; font-style: italic; color: var(--c-muted); }
+.t-magazine .tz-shead__more { display: inline-block; margin-top: 14px; font-size: .7rem; font-weight: 600; text-transform: uppercase; letter-spacing: .22em; color: var(--tz-gold); border-bottom: 1px solid currentColor; padding-bottom: 2px; }
+.t-magazine .tz-shead__more:hover { color: var(--c-text); }
+
+/* ---------- Cover story (hero) ---------- */
+.t-magazine .tz-cover { position: relative; isolation: isolate; overflow: hidden; display: flex; align-items: flex-end; min-height: clamp(520px, 86vh, 900px); background: var(--c-text); color: #fff; }
+.t-magazine .tz-cover__media { position: absolute; inset: 0; z-index: -2; }
+.t-magazine .tz-cover__img { width: 100%; height: 100%; aspect-ratio: auto; object-fit: cover; border-radius: 0; }
+.t-magazine .tz-cover__shade { position: absolute; inset: 0; z-index: -1;
+  background: linear-gradient(180deg, rgba(0,0,0,.08) 0%, rgba(0,0,0,.28) 42%, rgba(0,0,0,.86) 100%), linear-gradient(90deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,0) 65%); }
+.t-magazine .tz-cover__content { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: clamp(32px, 5vw, 72px); align-items: end; padding: 140px 0 clamp(40px, 6vw, 80px); }
+.t-magazine .tz-cover__kicker { margin: 0; font-size: .76rem; font-weight: 600; text-transform: uppercase; letter-spacing: .28em; color: var(--tz-gold-lt); }
+.t-magazine .tz-cover__kicker a:hover { text-decoration: underline; }
+.t-magazine .tz-cover__title { margin: .18em 0 .22em; font-size: clamp(3rem, 10vw, 9.5rem); line-height: .88; letter-spacing: -.015em; text-shadow: 0 2px 30px rgba(0,0,0,.35); }
+.t-magazine .tz-cover__title a:hover { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: .08em; }
+.t-magazine .tz-cover__deck { margin: 0 0 16px; max-width: 34em; font-family: var(--font-heading); font-style: italic; font-size: clamp(1.25rem, 2.3vw, 1.85rem); line-height: 1.3; color: rgba(255,255,255,.9); }
+.t-magazine .tz-cover__by { margin: 0 0 28px; font-variant: small-caps; letter-spacing: .08em; color: rgba(255,255,255,.82); }
+.t-magazine .tz-cover__by a { border-bottom: 1px solid rgba(255,255,255,.45); }
+.t-magazine .tz-cover__listen { display: inline-flex; align-items: center; gap: 12px; padding: 14px 30px; border: 1px solid #fff; border-radius: var(--radius); font-size: .76rem; font-weight: 600; text-transform: uppercase; letter-spacing: .26em; transition: background .2s, color .2s; }
+.t-magazine .tz-cover__listen:hover { background: #fff; color: #111; }
+.t-magazine .tz-cover__lines { border-left: 1px solid rgba(255,255,255,.4); padding-left: 24px; }
+.t-magazine .tz-cover__lines-title { margin: 0 0 6px; font-size: .68rem; text-transform: uppercase; letter-spacing: .26em; color: rgba(255,255,255,.7); }
+.t-magazine .tz-cover__lines ul { list-style: none; margin: 0; padding: 0; }
+.t-magazine .tz-cover__lines li + li { border-top: 1px solid rgba(255,255,255,.22); }
+.t-magazine .tz-cover__lines a { display: block; padding: 12px 0; }
+.t-magazine .tz-cover__line-kicker { display: block; font-size: .64rem; text-transform: uppercase; letter-spacing: .22em; color: var(--tz-gold-lt); }
+.t-magazine .tz-cover__line-title { display: block; font-family: var(--font-heading); font-size: 1.4rem; line-height: 1.15; }
+.t-magazine .tz-cover__lines a:hover .tz-cover__line-title { text-decoration: underline; text-underline-offset: .15em; }
+
+/* ---------- Featured stories spread ---------- */
+.t-magazine .tz-spread { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); grid-template-areas: 'lead mediums' 'smalls smalls'; gap: 40px; }
+.t-magazine .tz-spread__lead { grid-area: lead; }
+.t-magazine .tz-spread__mediums { grid-area: mediums; display: grid; gap: 32px; align-content: start; border-left: 1px solid var(--tz-hair); padding-left: 40px; }
+.t-magazine .tz-spread__mediums > * + * { border-top: 1px solid var(--tz-hair); padding-top: 28px; }
+.t-magazine .tz-spread__smalls { grid-area: smalls; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 32px; border-top: 1px solid var(--c-text); padding-top: 28px; }
+.t-magazine .tz-spread__mediums:only-child, .t-magazine .tz-spread__lead:only-child { grid-column: 1 / -1; }
+.t-magazine .tz-story__art { display: block; margin-bottom: 16px; overflow: hidden; border-radius: var(--radius); }
+.t-magazine .tz-story__art .pe-art { border-radius: 0; transition: transform .6s ease; }
+.t-magazine .tz-story:hover .tz-story__art .pe-art { transform: scale(1.025); }
+.t-magazine .tz-story--lead .tz-story__art .pe-art { aspect-ratio: 16 / 10; }
+.t-magazine .tz-story--medium .tz-story__art .pe-art { aspect-ratio: 3 / 2; }
+.t-magazine .tz-story__title { margin: 0 0 10px; line-height: 1.08; }
+.t-magazine .tz-story__title a:hover { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .12em; }
+.t-magazine .tz-story--lead .tz-story__title { font-size: clamp(2.2rem, 4vw, 3.6rem); line-height: 1; }
+.t-magazine .tz-story--medium .tz-story__title { font-size: clamp(1.5rem, 2.2vw, 1.9rem); }
+.t-magazine .tz-story--small .tz-story__title { font-size: 1.25rem; font-weight: 600; }
+.t-magazine .tz-story__deck { margin: 0 0 12px; font-style: italic; color: var(--tz-soft); }
+.t-magazine .tz-story--lead .tz-story__deck { font-family: var(--font-heading); font-size: clamp(1.2rem, 1.8vw, 1.45rem); line-height: 1.4; }
+.t-magazine .tz-story--medium .tz-story__deck { font-size: .95rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.t-magazine .tz-story--small { display: grid; grid-template-columns: 84px minmax(0, 1fr); gap: 16px; align-items: start; }
+.t-magazine .tz-story--small .tz-story__art { margin: 0; }
+.t-magazine .tz-spread__smalls > * + * { border-left: 1px solid var(--tz-hair); padding-left: 32px; margin-left: -1px; }
+
+/* ---------- Podcast grid & card ---------- */
+.t-magazine .tz-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr)); gap: 44px 32px; }
+.t-magazine .tz-card { display: flex; flex-direction: column; min-width: 0; }
+.t-magazine .tz-card__link { display: block; color: inherit; }
+.t-magazine .tz-card__art { position: relative; margin-bottom: 16px; }
+.t-magazine .tz-card__art .pe-art { box-shadow: 0 18px 36px -18px rgba(0,0,0,.45); }
+.t-magazine .tz-card__rank { position: absolute; left: 0; bottom: 0; padding: 4px 12px 0 0; background: var(--c-bg); font-family: var(--font-heading); font-style: italic; font-size: 2.4rem; line-height: 1; color: var(--c-text); }
+.t-magazine .tz-card__title { margin: 0 0 8px; font-size: 1.55rem; font-weight: 600; line-height: 1.08; }
+.t-magazine .tz-card__link:hover .tz-card__title { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .12em; }
+.t-magazine .tz-card__deck { margin: 0 0 10px; font-style: italic; font-size: .93rem; color: var(--tz-soft); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* ---------- Episode rows ---------- */
+.t-magazine .tz-eplist { display: grid; border-bottom: 1px solid var(--tz-hair); }
+.t-magazine .tz-eplist--cols { grid-template-columns: repeat(auto-fill, minmax(min(100%, 460px), 1fr)); column-gap: 56px; border-bottom: 0; }
+.t-magazine .tz-ep { display: grid; grid-template-columns: 96px minmax(0, 1fr) auto; gap: 20px; align-items: start; padding: 22px 0; border-top: 1px solid var(--tz-hair); }
+.t-magazine .tz-ep__art { display: block; }
+.t-magazine .tz-ep__body { min-width: 0; }
+.t-magazine .tz-ep__title { margin: 0 0 6px; font-size: 1.4rem; font-weight: 600; line-height: 1.12; }
+.t-magazine .tz-ep__title a:hover { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .12em; }
+.t-magazine .tz-ep__deck { margin: 0 0 8px; font-style: italic; font-size: .92rem; color: var(--tz-soft); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.t-magazine .tz-ep__meta { margin: 0; font-size: .82rem; color: var(--c-muted); font-variant: small-caps; letter-spacing: .04em; }
+.t-magazine :is(.tz-ep__play, .tz-index__play) { width: 44px; height: 44px; background: transparent; color: var(--c-text); border: 1px solid var(--c-text); }
+.t-magazine :is(.tz-ep__play, .tz-index__play) svg { width: 16px; height: 16px; }
+.t-magazine :is(.tz-ep__play, .tz-index__play):hover, .t-magazine :is(.tz-ep__play, .tz-index__play).is-playing { background: var(--c-text); color: var(--c-bg); filter: none; }
+
+/* ---------- Contents (categories) ---------- */
+.t-magazine .tz-contents { list-style: none; margin: 0 auto; padding: 0; max-width: 1040px; columns: 2 320px; column-gap: 64px; }
+.t-magazine .tz-contents li { break-inside: avoid; }
+.t-magazine .tz-contents a { display: flex; align-items: baseline; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--tz-hair); }
+.t-magazine .tz-contents__no { font-family: var(--font-heading); font-style: italic; font-size: 1.1rem; color: var(--tz-gold); min-width: 1.6em; }
+.t-magazine .tz-contents__name { font-family: var(--font-heading); font-size: 1.5rem; line-height: 1.1; }
+.t-magazine .tz-contents__dots { flex: 1; border-bottom: 1px dotted var(--tz-rule); transform: translateY(-4px); min-width: 16px; }
+.t-magazine .tz-contents__count { font-size: .8rem; font-style: italic; color: var(--c-muted); white-space: nowrap; }
+.t-magazine .tz-contents a:hover .tz-contents__name { color: var(--tz-gold); }
+
+/* ---------- Collections as dossiers ---------- */
+.t-magazine .tz-dossiers { margin-top: clamp(56px, 8vw, 104px); }
+.t-magazine .tz-dossier { position: relative; isolation: isolate; overflow: hidden; padding: clamp(52px, 8vw, 104px) 0; }
+.t-magazine .tz-dossier--dark { background: var(--c-text); color: var(--c-bg); }
+.t-magazine .tz-dossier--light { background: var(--c-surface); border-block: 1px solid var(--tz-hair); }
+.t-magazine .tz-dossier__bg { position: absolute; inset: 0; z-index: -1; background-size: cover; background-position: center; opacity: .13; filter: grayscale(1); }
+.t-magazine .tz-dossier__inner { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(32px, 5vw, 80px); align-items: center; }
+.t-magazine .tz-dossier__no { margin: 0; font-size: .72rem; font-weight: 600; text-transform: uppercase; letter-spacing: .24em; color: var(--tz-gold); }
+.t-magazine .tz-dossier--dark .tz-dossier__no { color: var(--tz-gold-lt); }
+.t-magazine .tz-dossier__title { margin: .2em 0 .3em; font-size: clamp(2.6rem, 6vw, 5.6rem); line-height: .94; }
+.t-magazine .tz-dossier__desc { margin: 0 0 26px; max-width: 42ch; font-family: var(--font-heading); font-style: italic; font-size: clamp(1.15rem, 1.6vw, 1.35rem); line-height: 1.45; opacity: .88; }
+.t-magazine .tz-dossier__link { display: inline-block; padding-bottom: 4px; border-bottom: 1px solid currentColor; font-size: .74rem; font-weight: 600; text-transform: uppercase; letter-spacing: .22em; }
+.t-magazine .tz-dossier__link:hover { color: var(--tz-gold); }
+.t-magazine .tz-dossier--dark .tz-dossier__link:hover { color: var(--tz-gold-lt); }
+.t-magazine .tz-dossier__covers { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px 22px; }
+.t-magazine .tz-dossier__covers a { display: block; }
+.t-magazine .tz-dossier__covers .pe-art { box-shadow: 0 22px 40px -20px rgba(0,0,0,.6); transition: transform .3s ease; }
+.t-magazine .tz-dossier__covers a:hover .pe-art { transform: translateY(-4px); }
+.t-magazine .tz-dossier__ctitle { display: block; margin-top: 12px; font-family: var(--font-heading); font-size: 1.15rem; line-height: 1.15; }
+.t-magazine .tz-dossier__covers a:hover .tz-dossier__ctitle { text-decoration: underline; text-underline-offset: .15em; }
+.t-magazine .tz-dossier__ccat { display: block; margin-top: 4px; font-size: .64rem; text-transform: uppercase; letter-spacing: .18em; opacity: .72; }
+
+/* ---------- Editors' picks: numbered list ---------- */
+.t-magazine .tz-picks__list { list-style: none; margin: 0 auto; padding: 0; max-width: 1000px; }
+.t-magazine .tz-pick { display: grid; grid-template-columns: 110px minmax(0, 1fr) 140px; gap: 32px; align-items: center; padding: 30px 0; border-top: 1px solid var(--tz-hair); }
+.t-magazine .tz-pick:last-child { border-bottom: 1px solid var(--tz-hair); }
+.t-magazine .tz-pick__no { font-family: var(--font-heading); font-style: italic; font-size: clamp(2.6rem, 6vw, 5rem); line-height: .9; color: var(--tz-gold); }
+.t-magazine .tz-pick__title { margin: 0 0 8px; font-size: clamp(1.6rem, 3vw, 2.4rem); line-height: 1.05; }
+.t-magazine .tz-pick__title a:hover { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .12em; }
+.t-magazine .tz-pick__deck { margin: 0 0 10px; font-style: italic; color: var(--tz-soft); }
+.t-magazine .tz-pick__art { display: block; }
+
+/* ---------- Newsletter / CTA ---------- */
+.t-magazine .tz-letter { text-align: center; max-width: 780px; }
+.t-magazine .tz-letter__title { margin: 0 0 12px; font-size: clamp(2.2rem, 5vw, 3.8rem); font-style: italic; line-height: 1.05; }
+.t-magazine .tz-letter__text { margin: 0 auto 22px; max-width: 52ch; color: var(--tz-soft); }
+.t-magazine .tz-letter__social { justify-content: center; gap: 10px 28px; }
+.t-magazine .tz-letter__social a { font-size: .74rem; font-weight: 600; text-transform: uppercase; letter-spacing: .2em; border-bottom: 1px solid var(--tz-gold); padding-bottom: 3px; }
+.t-magazine .tz-cta { text-align: center; padding: clamp(36px, 6vw, 80px) clamp(20px, 5vw, 64px); border: 3px double var(--c-text); background: var(--c-surface); }
+.t-magazine .tz-cta__title { margin: 0 0 12px; font-size: clamp(2.2rem, 5vw, 4.2rem); font-style: italic; line-height: 1.02; }
+.t-magazine .tz-cta__text { margin: 0 auto 26px; max-width: 52ch; color: var(--tz-soft); }
+
+/* ---------- Podcast page: feature opener ---------- */
+.t-magazine .tz-show { padding-top: clamp(32px, 5vw, 72px); }
+.t-magazine .tz-opener { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: clamp(28px, 5vw, 80px); align-items: end; padding-bottom: clamp(36px, 5vw, 60px); border-bottom: 3px double var(--c-text); }
+.t-magazine .tz-opener__art .pe-art { box-shadow: 0 34px 70px -28px rgba(0,0,0,.5); }
+.t-magazine .tz-opener__title { margin: .12em 0 .22em; font-size: clamp(2.8rem, 7vw, 6.6rem); line-height: .92; letter-spacing: -.01em; }
+.t-magazine .tz-opener__deck { margin: 0 0 20px; font-family: var(--font-heading); font-style: italic; font-size: clamp(1.25rem, 2.2vw, 1.75rem); line-height: 1.35; color: var(--tz-soft); }
+.t-magazine .tz-opener__by { margin: 0 0 6px; font-variant: small-caps; letter-spacing: .06em; font-size: 1.05rem; }
+.t-magazine .tz-opener__by a { border-bottom: 1px solid var(--c-primary); }
+.t-magazine .tz-opener__by a:hover { color: var(--tz-gold); }
+.t-magazine .tz-opener__meta { margin: 0; font-size: .74rem; text-transform: uppercase; letter-spacing: .16em; color: var(--c-muted); }
+.t-magazine .tz-opener__actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+
+.t-magazine .tz-cols { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: clamp(32px, 5vw, 80px); align-items: start; padding-top: clamp(36px, 5vw, 60px); }
+.t-magazine .tz-side { border-left: 1px solid var(--tz-hair); padding-left: clamp(24px, 3vw, 40px); min-width: 0; }
+.t-magazine .tz-side__block { padding: 22px 0; border-bottom: 1px solid var(--tz-hair); }
+.t-magazine .tz-side__block:first-child { padding-top: 0; }
+.t-magazine .tz-side__block:last-child { border-bottom: 0; }
+.t-magazine .tz-side__title, .t-magazine .tz-listenon .pe-listen__title { margin: 0 0 12px; font-family: var(--font-body); font-size: .72rem; font-weight: 600; text-transform: uppercase; letter-spacing: .22em; color: var(--tz-gold); }
+.t-magazine .tz-side__note { margin: 0 0 14px; font-style: italic; font-size: .92rem; color: var(--tz-soft); }
+.t-magazine .tz-side .tz-prose { font-size: .96rem; }
+.t-magazine .tz-listenon .pe-listen__btn { border-radius: var(--radius); }
+.t-magazine .tz-share .pe-share__btn { border-radius: var(--radius); font-size: .8rem; }
+.t-magazine .tz-tags { margin-top: 14px; }
+.t-magazine .tz-tags a { background: transparent; border: 1px solid var(--tz-rule); border-radius: var(--radius); font-style: italic; }
+.t-magazine .tz-tags a:hover { border-color: var(--c-text); }
+.t-magazine .tz-subscribe .pe-subscribe__panel { border-radius: var(--radius); border: 1px solid var(--tz-rule); }
+.t-magazine .tz-subscribe .pe-subscribe__row button, .t-magazine .tz-subscribe .pe-subscribe__row input { border-radius: var(--radius); }
+.t-magazine .tz-people { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+.t-magazine .tz-people a { display: flex; align-items: center; gap: 14px; }
+.t-magazine .tz-people .pe-art { width: 48px; height: 48px; flex: none; }
+.t-magazine .tz-people__name { display: block; font-family: var(--font-heading); font-size: 1.2rem; line-height: 1.15; }
+.t-magazine .tz-people a:hover .tz-people__name { text-decoration: underline; text-underline-offset: .15em; }
+.t-magazine .tz-people__role { display: block; font-size: .68rem; text-transform: uppercase; letter-spacing: .16em; color: var(--c-muted); }
+
+/* Episode index on podcast page */
+.t-magazine .tz-index__head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px 20px; border-bottom: 1px solid var(--c-text); padding-bottom: 10px; }
+.t-magazine .tz-index__head .tz-h2 { margin: 0; }
+.t-magazine .tz-index__head p { margin: 0; font-style: italic; }
+.t-magazine .tz-index__latest { margin: 14px 0 0; font-style: italic; }
+.t-magazine .tz-index__latest a { border-bottom: 1px solid var(--c-primary); }
+.t-magazine .tz-index__list { list-style: none; margin: 0 0 32px; padding: 0; }
+.t-magazine .tz-index__item { display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; gap: 20px; align-items: start; padding: 26px 0; border-bottom: 1px solid var(--tz-hair); }
+.t-magazine .tz-index__no { font-family: var(--font-heading); font-style: italic; font-size: 2.5rem; line-height: .95; color: var(--tz-gold); }
+.t-magazine .tz-index__text { min-width: 0; }
+.t-magazine .tz-index__meta { margin: 0 0 6px; font-size: .7rem; text-transform: uppercase; letter-spacing: .16em; color: var(--c-muted); }
+.t-magazine .tz-index__title { margin: 0 0 6px; font-size: clamp(1.35rem, 2.2vw, 1.7rem); font-weight: 600; line-height: 1.1; }
+.t-magazine .tz-index__title a:hover { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .12em; }
+.t-magazine .tz-index__deck { margin: 0; font-style: italic; font-size: .95rem; color: var(--tz-soft); }
+
+/* ---------- Episode page: long-form feature ---------- */
+.t-magazine .tz-feature__head { max-width: 1000px; text-align: center; padding: clamp(36px, 6vw, 88px) 0 clamp(28px, 4vw, 44px); }
+.t-magazine .tz-feature__title { margin: .14em 0 .3em; font-size: clamp(2.6rem, 7vw, 6.2rem); line-height: .94; letter-spacing: -.01em; }
+.t-magazine .tz-feature__standfirst { margin: 0 auto 20px; max-width: 34em; font-family: var(--font-heading); font-style: italic; font-size: clamp(1.3rem, 2.4vw, 1.9rem); line-height: 1.35; color: var(--tz-soft); }
+.t-magazine .tz-feature__byline { margin: 0; font-variant: small-caps; letter-spacing: .06em; color: var(--c-muted); }
+.t-magazine .tz-feature__byline a { color: var(--c-text); border-bottom: 1px solid var(--c-primary); }
+.t-magazine .tz-feature__byline a:hover { color: var(--tz-gold); }
+.t-magazine .tz-feature__actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 26px; }
+.t-magazine .tz-feature__fig { margin-block: 0; padding: clamp(20px, 5vw, 64px); background: var(--c-text); display: grid; justify-items: center; }
+.t-magazine .tz-feature__img { width: min(560px, 100%); box-shadow: 0 40px 80px -30px rgba(0,0,0,.8); }
+.t-magazine .tz-feature__fig figcaption { margin-top: 18px; font-style: italic; font-size: .85rem; color: color-mix(in srgb, var(--c-bg) 72%, transparent); }
+.t-magazine .tz-feature__fig figcaption a { color: var(--c-bg); border-bottom: 1px solid color-mix(in srgb, var(--c-bg) 40%, transparent); }
+
+.t-magazine .tz-article { min-width: 0; max-width: 72ch; font-size: 1.08rem; line-height: 1.8; }
+.t-magazine .tz-dropcap::first-letter { float: left; font-family: var(--font-heading); font-weight: 600; font-size: 4.8em; line-height: .78; padding: .07em .1em 0 0; color: var(--tz-gold); }
+.t-magazine .tz-pull { margin: 44px 0; padding: 30px 0 26px; border-block: 1px solid var(--c-text); }
+.t-magazine .tz-pull::before { content: '\201C'; display: block; height: .5em; font-family: var(--font-heading); font-size: 4.5rem; line-height: 1; color: var(--tz-gold); }
+.t-magazine .tz-pull p { margin: 0; font-family: var(--font-heading); font-style: italic; font-size: clamp(1.6rem, 3.2vw, 2.4rem); line-height: 1.2; }
+.t-magazine .tz-article :is(.pe-topics, .pe-faq, .pe-citations, .tz-transcript) { margin-top: 52px; }
+.t-magazine .tz-article :is(.pe-topics, .pe-faq, .pe-citations) > h2,
+.t-magazine .tz-transcript .pe-transcript__head h2 { margin: 0 0 14px; font-size: clamp(1.7rem, 2.6vw, 2.1rem); line-height: 1.1; }
+.t-magazine .tz-article :is(.pe-topics, .pe-faq, .pe-citations), .t-magazine .tz-transcript { border-top: 1px solid var(--c-text); padding-top: 14px; }
+.t-magazine .tz-transcript .pe-transcript__head h2 { margin: 0; }
+.t-magazine .tz-transcript .pe-transcript__head button { border-radius: var(--radius); font-size: .72rem; text-transform: uppercase; letter-spacing: .16em; }
+.t-magazine .tz-transcript .pe-transcript__cues { font-size: .98rem; line-height: 1.65; }
+.t-magazine .pe-topics li { background: transparent; border: 1px solid var(--tz-rule); border-radius: var(--radius); font-family: var(--font-heading); font-style: italic; font-size: 1.05rem; }
+.t-magazine .pe-faq summary { font-family: var(--font-heading); font-size: 1.3rem; font-weight: 600; }
+.t-magazine .pe-faq details p { margin: 10px 0 0; color: var(--tz-soft); }
+.t-magazine .pe-citations ul { list-style: none; margin: 0; padding: 0; counter-reset: tzref; }
+.t-magazine .pe-citations li { counter-increment: tzref; display: flex; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--tz-hair); }
+.t-magazine .pe-citations li::before { content: counter(tzref, decimal-leading-zero); font-family: var(--font-heading); font-style: italic; color: var(--tz-gold); }
+.t-magazine .pe-citations a { color: var(--c-text); font-family: var(--font-heading); font-size: 1.2rem; line-height: 1.25; overflow-wrap: anywhere; }
+.t-magazine .pe-citations a:hover { color: var(--tz-gold); text-decoration: underline; }
+.t-magazine .tz-showcard__link { display: flex; align-items: center; gap: 14px; font-family: var(--font-heading); font-size: 1.3rem; line-height: 1.15; }
+.t-magazine .tz-showcard__link .pe-art { flex: none; }
+.t-magazine .tz-showcard__link:hover span { text-decoration: underline; text-underline-offset: .15em; }
+.t-magazine .tz-prevnext { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-top: clamp(48px, 6vw, 80px); border-block: 3px double var(--c-text); }
+.t-magazine .tz-prevnext a { display: block; padding: 24px 0; }
+.t-magazine .tz-prevnext__next { text-align: right; grid-column: 2; }
+.t-magazine .tz-prevnext__title { display: block; font-family: var(--font-heading); font-size: 1.45rem; line-height: 1.15; }
+.t-magazine .tz-prevnext a:hover .tz-prevnext__title { text-decoration: underline; text-underline-offset: .15em; }
+
+/* ---------- Player: slim elegant bar ---------- */
+.t-magazine .tz-player-spacer { height: 80px; }
+.t-magazine .tz-player { position: fixed; z-index: 50; left: 0; right: 0; bottom: 0; background: var(--c-text); color: var(--c-bg); border-top: 1px solid color-mix(in srgb, var(--c-primary) 60%, transparent); box-shadow: 0 -10px 30px rgba(0,0,0,.18); }
+.t-magazine .tz-player__rule { position: absolute; left: 0; right: 0; top: -9px; }
+.t-magazine input[type='range'].tz-player__seek { display: block; width: 100%; height: 18px; margin: 0; padding: 8px 0; border-radius: 0; background-clip: content-box; }
+.t-magazine input[type='range'].tz-player__seek::-webkit-slider-thumb { width: 11px; height: 11px; border: 0; background: var(--c-primary); }
+.t-magazine input[type='range'].tz-player__seek::-moz-range-thumb { width: 11px; height: 11px; border: 0; background: var(--c-primary); }
+.t-magazine .tz-player__inner { display: grid; grid-template-columns: minmax(0, 1.4fr) auto auto minmax(0, 1fr); align-items: center; gap: clamp(12px, 2.4vw, 32px); min-height: 72px; padding: 10px clamp(12px, 3vw, 32px); font-family: var(--font-heading); }
+.t-magazine .tz-player__now { min-width: 0; }
+.t-magazine .tz-player__label { display: block; font-variant: small-caps; text-transform: lowercase; letter-spacing: .16em; font-size: .9rem; line-height: 1.1; color: var(--tz-gold-lt); }
+.t-magazine .tz-player__label--inline { display: inline; }
+.t-magazine .tz-player__meta { gap: 12px; margin-top: 2px; }
+.t-magazine .tz-player__meta .pe-nowplaying__art { width: 42px; height: 42px; border-radius: var(--radius); }
+.t-magazine .tz-player__meta .pe-nowplaying__title { font-size: 1.12rem; font-weight: 600; line-height: 1.2; color: var(--c-bg); }
+.t-magazine .tz-player__meta .pe-nowplaying__podcast { font-variant: small-caps; letter-spacing: .06em; font-size: .9rem; color: color-mix(in srgb, var(--c-bg) 70%, transparent); }
+.t-magazine .tz-player__meta a:hover { text-decoration: underline; text-underline-offset: .15em; }
+.t-magazine .tz-player__transport { display: flex; align-items: center; gap: 6px; }
+.t-magazine .tz-player__icon { display: grid; place-items: center; padding: 8px; border: 0; background: none; color: inherit; opacity: .8; }
+.t-magazine .tz-player__icon:hover:not(:disabled) { opacity: 1; color: var(--tz-gold-lt); }
+.t-magazine .tz-player__icon svg { width: 22px; height: 22px; }
+.t-magazine .tz-player__play { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%; border: 1px solid currentColor; background: transparent; color: inherit; transition: background .2s, color .2s; }
+.t-magazine .tz-player__play:hover:not(:disabled) { background: var(--c-bg); color: var(--c-text); }
+.t-magazine .tz-player__play svg { width: 18px; height: 18px; }
+.t-magazine .tz-player__times { display: flex; align-items: baseline; gap: 6px; font-variant-numeric: lining-nums tabular-nums; font-size: 1rem; white-space: nowrap; }
+.t-magazine .tz-player__sep { opacity: .5; }
+.t-magazine .tz-player__time:last-child { opacity: .7; }
+.t-magazine .tz-player__opts { display: flex; justify-content: flex-end; align-items: center; gap: 10px; }
+.t-magazine .tz-player__speed select { background: transparent; color: inherit; border: 1px solid color-mix(in srgb, var(--c-bg) 35%, transparent); border-radius: var(--radius); padding: 4px 6px; font-family: var(--font-heading); font-size: .95rem; }
+.t-magazine .tz-player__speed option { color: #111; background: #fff; }
+.t-magazine .tz-player__volume { display: flex; align-items: center; gap: 6px; }
+.t-magazine .tz-player__volume button { display: grid; place-items: center; padding: 6px; border: 0; background: none; color: inherit; opacity: .8; }
+.t-magazine .tz-player__volume button:hover { opacity: 1; }
+.t-magazine .tz-player__volume button svg { width: 20px; height: 20px; }
+.t-magazine .tz-player__volume input[type='range'] { width: 84px; height: 2px; border-radius: 0; }
+.t-magazine .tz-player__error { display: block; padding: 0 clamp(12px, 3vw, 32px) 8px; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1100px) {
+  .t-magazine .tz-spread { grid-template-columns: 1fr; grid-template-areas: 'lead' 'mediums' 'smalls'; }
+  .t-magazine .tz-spread__mediums { border-left: 0; padding-left: 0; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px; }
+  .t-magazine .tz-spread__mediums > * + * { border-top: 0; padding-top: 0; border-left: 1px solid var(--tz-hair); padding-left: 32px; }
+  .t-magazine .tz-spread__smalls { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .t-magazine .tz-spread__smalls > * + * { border-left: 0; padding-left: 0; margin-left: 0; }
+  .t-magazine .tz-cols { grid-template-columns: minmax(0, 1fr); }
+  .t-magazine .tz-side { border-left: 0; padding-left: 0; border-top: 3px double var(--c-text); padding-top: 28px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); column-gap: 40px; }
+  .t-magazine .tz-side__block:first-child { padding-top: 22px; }
+  .t-magazine .tz-side__block:last-child { border-bottom: 1px solid var(--tz-hair); }
+  .t-magazine .tz-article { max-width: none; }
+  .t-magazine .tz-player__label--inline { display: none; }
+}
+@media (max-width: 860px) {
+  .t-magazine .tz-mast__tag { display: none; }
+  .t-magazine .tz-mast__top { flex-wrap: wrap; }
+  .t-magazine .tz-mast:not([data-nav-open='true']) .tz-search { display: none; }
+  .t-magazine .tz-search { order: 3; width: 100%; }
+  .t-magazine .tz-nav { display: none; }
+  .t-magazine .tz-mast[data-nav-open='true'] .tz-nav { display: block; }
+  .t-magazine .tz-nav ul { flex-direction: column; align-items: stretch; text-align: center; }
+  .t-magazine .tz-nav li { display: block; }
+  .t-magazine .tz-nav li + li { border-top: 1px solid var(--tz-hair); }
+  .t-magazine .tz-nav li + li::before { content: none; }
+  .t-magazine .tz-mast:not([data-nav-open='true']) .tz-mast__brand { border-bottom: 3px double var(--c-text); }
+  .t-magazine .tz-cover__content { grid-template-columns: minmax(0, 1fr); padding-top: 120px; }
+  .t-magazine .tz-cover__lines { display: none; }
+  .t-magazine .tz-opener { grid-template-columns: minmax(0, 1fr); align-items: start; }
+  .t-magazine .tz-opener__art { width: min(440px, 100%); }
+  .t-magazine .tz-dossier__inner { grid-template-columns: minmax(0, 1fr); }
+  .t-magazine .tz-pick { grid-template-columns: 64px minmax(0, 1fr) 96px; gap: 20px; }
+  .t-magazine .tz-player__times, .t-magazine .tz-player__volume { display: none; }
+  .t-magazine .tz-player__inner { grid-template-columns: minmax(0, 1fr) auto auto; }
+}
+@media (max-width: 600px) {
+  .t-magazine .tz-wrap, .t-magazine .tz-main > :where(:not(.tz-home, .tz-show, .tz-feature)) { width: calc(100% - 32px); }
+  .t-magazine .tz-cover { min-height: 500px; }
+  .t-magazine .tz-spread__mediums, .t-magazine .tz-spread__smalls { grid-template-columns: minmax(0, 1fr); }
+  .t-magazine .tz-spread__mediums > * + * { border-left: 0; padding-left: 0; border-top: 1px solid var(--tz-hair); padding-top: 28px; }
+  .t-magazine .tz-spread__smalls > * + * { border-top: 1px solid var(--tz-hair); padding-top: 24px; }
+  .t-magazine .tz-spread__smalls { gap: 24px; }
+  .t-magazine .tz-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px 16px; }
+  .t-magazine .tz-card__title { font-size: 1.2rem; }
+  .t-magazine .tz-card__deck { -webkit-line-clamp: 2; font-size: .86rem; }
+  .t-magazine .tz-card__rank { font-size: 1.8rem; }
+  .t-magazine .tz-ep { grid-template-columns: 64px minmax(0, 1fr) auto; gap: 14px; }
+  .t-magazine .tz-ep__title { font-size: 1.2rem; }
+  .t-magazine .tz-index__item { grid-template-columns: 40px minmax(0, 1fr) auto; gap: 12px; }
+  .t-magazine .tz-index__no { font-size: 1.8rem; }
+  .t-magazine .tz-contents__name { font-size: 1.25rem; }
+  .t-magazine .tz-dossier__covers { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 16px; }
+  .t-magazine .tz-pick { grid-template-columns: 44px minmax(0, 1fr); }
+  .t-magazine .tz-pick__art { display: none; }
+  .t-magazine .tz-prevnext { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .t-magazine .tz-prevnext__next { grid-column: 1; text-align: left; border-top: 1px solid var(--tz-hair); }
+  .t-magazine .tz-article { font-size: 1.02rem; }
+  .t-magazine .tz-opener__actions > *, .t-magazine .tz-feature__actions > * { flex: 1 1 auto; }
+}
+@media (max-width: 480px) {
+  .t-magazine .tz-player__skip, .t-magazine .tz-player__meta .pe-nowplaying__art, .t-magazine .tz-player__label { display: none; }
+  .t-magazine .tz-player__inner { gap: 8px; min-height: 64px; }
+  .t-magazine .tz-player-spacer { height: 70px; }
+}

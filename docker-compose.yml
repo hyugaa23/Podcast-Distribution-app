@@ -1,0 +1,145 @@
+# Single-VPS deployment: web, admin, API, worker, database, queue and media files on one server (PRD §101, §102, §111).
+#   cp .env.production.example .env   # set domains + secrets
+#   docker compose up -d --build
+# Audio and images are stored on the VPS disk (volume "media") and served by Caddy with HTTP Range support.
+name: podcast-platform
+
+x-logging: &logging
+  driver: json-file
+  options: { max-size: "10m", max-file: "3" }
+
+x-api-env: &api-env
+  APP_ENV: production
+  DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}@postgres:5432/podcast?sslmode=disable
+  REDIS_URL: redis://redis:6379/0
+  STORAGE_DRIVER: local
+  STORAGE_LOCAL_DIR: /data/media
+  CDN_URL: https://${API_DOMAIN:?set API_DOMAIN}/media
+  JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET}
+  REVALIDATE_SECRET: ${REVALIDATE_SECRET:?set REVALIDATE_SECRET}
+  COOKIE_SECURE: "true"
+  APP_URL: https://${ADMIN_DOMAIN:?set ADMIN_DOMAIN}
+  API_PUBLIC_URL: https://${API_DOMAIN}
+  WEB_INTERNAL_URL: http://web:3000
+  CORS_ORIGINS: https://${ADMIN_DOMAIN}
+  DEV_AUTO_VERIFY_LOCAL_DOMAINS: "false"
+  SEED_ADMIN_EMAIL: ${SEED_ADMIN_EMAIL:?set SEED_ADMIN_EMAIL}
+  SEED_ADMIN_PASSWORD: ${SEED_ADMIN_PASSWORD:?set SEED_ADMIN_PASSWORD}
+  MAX_AUDIO_UPLOAD_MB: ${MAX_AUDIO_UPLOAD_MB:-500}
+  PLATFORM_CNAME_TARGET: ${PLATFORM_CNAME_TARGET:-}
+  PLATFORM_IPS: ${PLATFORM_IPS:-}
+  PODCASTINDEX_API_KEY: ${PODCASTINDEX_API_KEY:-}
+  PODCASTINDEX_API_SECRET: ${PODCASTINDEX_API_SECRET:-}
+  TRANSCRIPTION_API_URL: ${TRANSCRIPTION_API_URL:-}
+  TRANSCRIPTION_API_KEY: ${TRANSCRIPTION_API_KEY:-}
+  WORKER_CONCURRENCY: ${WORKER_CONCURRENCY:-2}
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: podcast
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck: { test: ["CMD-SHELL", "pg_isready -U postgres"], interval: 5s, retries: 20 }
+    restart: unless-stopped
+    logging: *logging
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes: [redisdata:/data]
+    healthcheck: { test: ["CMD", "redis-cli", "ping"], interval: 5s, retries: 20 }
+    restart: unless-stopped
+    logging: *logging
+
+  migrate:
+    build: { context: ., dockerfile: infrastructure/docker/api.Dockerfile }
+    image: podcast-api
+    command: ["migrate"]
+    environment: *api-env
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+    logging: *logging
+
+  api:
+    image: podcast-api
+    command: ["api"]
+    environment: *api-env
+    volumes: [media:/data/media]
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+    healthcheck: { test: ["CMD", "wget", "-qO-", "http://localhost:8080/readyz"], interval: 10s, retries: 10 }
+    restart: unless-stopped
+    logging: *logging
+
+  # Audio processing (FFmpeg → MP3 128–192 kbps), image variants (WebP), RSS imports, scheduled publishing.
+  worker:
+    image: podcast-api
+    command: ["worker"]
+    environment: *api-env
+    volumes: [media:/data/media]
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+    restart: unless-stopped
+    logging: *logging
+
+  web:
+    build: { context: ., dockerfile: infrastructure/docker/next.Dockerfile, args: { APP: web } }
+    environment:
+      API_INTERNAL_URL: http://api:8080
+      REVALIDATE_SECRET: ${REVALIDATE_SECRET}
+    depends_on: [api]
+    restart: unless-stopped
+    logging: *logging
+
+  admin:
+    build: { context: ., dockerfile: infrastructure/docker/next.Dockerfile, args: { APP: admin } }
+    environment:
+      API_INTERNAL_URL: http://api:8080
+      PORT: "3001"
+    depends_on: [api]
+    restart: unless-stopped
+    logging: *logging
+
+  # HTTPS for every domain (automatic certificates), routing, and direct media file serving.
+  proxy:
+    image: caddy:2-alpine
+    ports: ["80:80", "443:443"]
+    volumes:
+      - ./infrastructure/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - media:/srv/media:ro
+      - caddydata:/data
+    environment:
+      ADMIN_DOMAIN: ${ADMIN_DOMAIN}
+      API_DOMAIN: ${API_DOMAIN}
+    depends_on: [web, admin, api]
+    restart: unless-stopped
+    logging: *logging
+
+  # Daily database backup (keeps the last 14) into ./backups on the VPS.
+  backup:
+    image: postgres:17-alpine
+    environment:
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+    volumes: ["./backups:/backups"]
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        while true; do
+          f=/backups/podcast-$$(date +%Y%m%d-%H%M%S).dump
+          pg_dump -h postgres -U postgres --format=custom --no-owner podcast > "$$f" && echo "backup ok $$f" || { echo "backup failed"; rm -f "$$f"; }
+          ls -1t /backups/podcast-*.dump 2>/dev/null | tail -n +15 | xargs -r rm --
+          sleep 86400
+        done
+    depends_on:
+      postgres: { condition: service_healthy }
+    restart: unless-stopped
+    logging: *logging
+
+volumes:
+  pgdata: {}
+  redisdata: {}
+  media: {}
+  caddydata: {}

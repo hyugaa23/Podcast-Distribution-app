@@ -1,0 +1,84 @@
+/* Shared motion for all themes (see motion.tsx). Everything is disabled by prefers-reduced-motion. */
+
+/* Scroll reveal — only active once JS has enabled it, so content is always visible without JS. */
+html[data-motion='on'] .pe-root [data-reveal] {
+  opacity: 0;
+  transform: translate3d(0, 22px, 0);
+  transition:
+    opacity .7s cubic-bezier(.2, .7, .2, 1) calc(var(--reveal-i, 0) * 55ms),
+    transform .8s cubic-bezier(.2, .7, .2, 1) calc(var(--reveal-i, 0) * 55ms);
+  will-change: opacity, transform;
+}
+html[data-motion='on'] .pe-root [data-reveal='child'] { transform: translate3d(0, 14px, 0); }
+html[data-motion='on'] .pe-root [data-reveal][data-revealed] { opacity: 1; transform: none; }
+/* First block of the page (hero / show header) gets a bigger entrance. */
+html[data-motion='on'] .pe-root main > :first-child[data-reveal]:not([data-revealed]),
+html[data-motion='on'] .pe-root main > * > :first-child[data-reveal]:not([data-revealed]) { transform: translate3d(0, 34px, 0) scale(.985); }
+
+/* Artwork: fade in, lift + glow on hover */
+.pe-root img.pe-art { transition: transform .45s cubic-bezier(.2, .7, .2, 1), box-shadow .45s ease, filter .45s ease; }
+.pe-root a:hover img.pe-art, .pe-root a:focus-visible img.pe-art {
+  transform: translate3d(0, -4px, 0) scale(1.02);
+  box-shadow: 0 18px 40px -12px color-mix(in srgb, var(--c-primary) 45%, rgba(0, 0, 0, .55));
+  filter: saturate(1.08);
+}
+
+/* Cards / tiles: gentle lift on hover */
+.pe-root [class*='card']:not([class*='card__']):not(.pe-art),
+.pe-root [class*='tile']:not([class*='tile__']),
+.pe-root [class*='poster']:not([class*='poster__']) {
+  transition: transform .35s cubic-bezier(.2, .7, .2, 1), box-shadow .35s ease, background-color .3s ease, border-color .3s ease;
+}
+.pe-root [class*='card']:not([class*='card__']):not(.pe-art):hover,
+.pe-root [class*='tile']:not([class*='tile__']):hover { transform: translate3d(0, -3px, 0); }
+
+/* Links & buttons: smooth colour changes */
+.pe-root a, .pe-root button { transition: color .2s ease, background-color .2s ease, border-color .2s ease, opacity .2s ease, transform .2s ease; }
+.pe-root button:active:not(:disabled) { transform: scale(.96); }
+
+/* Play button: pulse ring while playing */
+.pe-play { position: relative; }
+.pe-play.is-playing::after {
+  content: ''; position: absolute; inset: -4px; border-radius: inherit; border: 2px solid var(--c-primary);
+  animation: pe-pulse 1.6s cubic-bezier(.2, .7, .2, 1) infinite; pointer-events: none;
+}
+@keyframes pe-pulse { 0% { opacity: .7; transform: scale(1); } 100% { opacity: 0; transform: scale(1.35); } }
+
+/* Equalizer (now playing) */
+.pe-eq { display: inline-flex; align-items: flex-end; gap: 2px; height: 14px; margin-right: 6px; vertical-align: -2px; }
+.pe-eq i { display: block; width: 3px; height: 100%; border-radius: 2px; background: var(--c-primary); transform-origin: bottom; animation: pe-eq 1s ease-in-out infinite; }
+.pe-eq i:nth-child(2) { animation-delay: -.35s; animation-duration: .8s; }
+.pe-eq i:nth-child(3) { animation-delay: -.6s; animation-duration: 1.15s; }
+.pe-eq i:nth-child(4) { animation-delay: -.15s; animation-duration: .9s; }
+.pe-eq[data-paused] i { animation-play-state: paused; transform: scaleY(.3); }
+@keyframes pe-eq { 0%, 100% { transform: scaleY(.25); } 50% { transform: scaleY(1); } }
+
+/* Player bars slide up when they appear */
+.pe-root [aria-label='Audio player'] { animation: pe-slide-up .5s cubic-bezier(.2, .7, .2, 1) both; }
+@keyframes pe-slide-up { from { transform: translate3d(0, 100%, 0); opacity: 0; } }
+
+/* Navigation progress bar */
+#pe-navbar { position: fixed; z-index: 9999; top: 0; left: 0; height: 3px; width: 0; opacity: 0; pointer-events: none;
+  background: linear-gradient(90deg, var(--c-primary, #1457ff), var(--c-accent, #7c5cff)); box-shadow: 0 0 10px var(--c-primary, #1457ff); }
+#pe-navbar.is-loading { opacity: 1; width: 80%; transition: width 8s cubic-bezier(.05, .6, .1, 1), opacity .2s; }
+#pe-navbar.is-done { opacity: 0; width: 100%; transition: width .25s ease, opacity .35s ease .2s; }
+
+/* Page transition (View Transitions API) */
+::view-transition-old(root) { animation: pe-vt-out .22s ease both; }
+::view-transition-new(root) { animation: pe-vt-in .38s cubic-bezier(.2, .7, .2, 1) both; }
+@keyframes pe-vt-out { to { opacity: 0; transform: translate3d(0, -8px, 0); } }
+@keyframes pe-vt-in { from { opacity: 0; transform: translate3d(0, 12px, 0); } }
+
+/* Inputs: animated focus */
+.pe-search { transition: box-shadow .25s ease, border-color .25s ease; }
+.pe-search:focus-within { border-color: var(--c-primary); box-shadow: 0 0 0 4px color-mix(in srgb, var(--c-primary) 20%, transparent); }
+
+/* Listen-on & share buttons: lift */
+.pe-listen__btn, .pe-share__btn, .pe-chips a, .pe-tags a { transition: transform .2s ease, background-color .2s ease, border-color .2s ease, color .2s ease; }
+.pe-listen__btn:hover, .pe-share__btn:hover, .pe-chips a:hover, .pe-tags a:hover { transform: translate3d(0, -2px, 0); }
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-motion='on'] .pe-root [data-reveal] { opacity: 1 !important; transform: none !important; transition: none !important; }
+  .pe-play.is-playing::after, .pe-eq i, #pe-navbar { animation: none !important; transition: none !important; }
+  ::view-transition-old(root), ::view-transition-new(root) { animation: none !important; }
+}
