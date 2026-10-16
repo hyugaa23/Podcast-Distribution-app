@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useState } from 'react';
+import { Suspense, useCallback, useRef, useState } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { get } from '@/lib/api';
 import type { Podcast } from '@/lib/types';
@@ -19,12 +19,17 @@ function PodcastDetail() {
   const [tab, setTab] = useState<TabKey>(initial && TAB_KEYS.includes(initial) ? initial : 'details');
   const [created, setCreated] = useState(sp.get('created') === '1');
   const { data: p, error, loading, reload, setData } = useAsync(() => get<Podcast>(`/podcasts/${id}`), [id]);
+  const detailsDirtyRef = useRef(false);
+  const handleDirtyChange = useCallback((d: boolean) => { detailsDirtyRef.current = d; }, []);
 
   if (error) return <><PageHeader title="Podcast" back={{ href: '/podcasts', label: 'Podcasts' }} /><ErrorBox error={error} onRetry={reload} /></>;
   if (loading && !p) return <Spinner />;
   if (!p) return null;
 
   const changeTab = (k: TabKey) => {
+    if (tab === 'details' && detailsDirtyRef.current) {
+      if (!window.confirm('You have unsaved changes. Discard them and switch tabs?')) return;
+    }
     setTab(k);
     const u = new URL(window.location.href);
     u.searchParams.set('tab', k);
@@ -61,7 +66,7 @@ function PodcastDetail() {
         ]}
       />
       <div role="tabpanel">
-        {tab === 'details' && <DetailsTab key={p.id} p={p} onSaved={setData} onDeleted={() => router.push('/podcasts')} />}
+        {tab === 'details' && <DetailsTab key={p.id} p={p} onSaved={setData} onDeleted={() => router.push('/podcasts')} onDirtyChange={handleDirtyChange} />}
         {tab === 'episodes' && <EpisodesTab p={p} />}
         {tab === 'distribution' && <DistributionTab p={p} />}
         {tab === 'sites' && <SitesTab p={p} onChanged={reload} />}

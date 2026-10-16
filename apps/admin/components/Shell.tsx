@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, type ReactNode } from 'react';
+import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import type { Role } from '@/lib/api';
 import { get, post } from '@/lib/api';
@@ -106,7 +107,7 @@ export function Shell({ children }: { children: ReactNode }) {
 
   return (
     <div className={cx('shell', navOpen && 'nav-open')}>
-      <a className="skip" href="#content">Skip to content</a>
+      <Link className="skip" href="#content">Skip to content</Link>
       <aside className="side">
         <div className="side__brand"><BrandMark /><div><strong>Podcast Engine</strong><small>{isSuper ? 'Master Admin' : myTenant?.name ?? 'Tenant Admin'}</small></div></div>
         <nav aria-label="Admin">
@@ -118,7 +119,7 @@ export function Shell({ children }: { children: ReactNode }) {
                 <p>{g.title}</p>
                 <ul>
                   {items.map((i) => (
-                    <li key={i.href}><a href={i.href} aria-current={active(i.href) ? 'page' : undefined}><Icon name={i.icon} />{i.label}</a></li>
+                    <li key={i.href}><Link href={i.href} aria-current={active(i.href) ? 'page' : undefined}><Icon name={i.icon} />{i.label}</Link></li>
                   ))}
                 </ul>
               </div>
@@ -143,7 +144,7 @@ export function Shell({ children }: { children: ReactNode }) {
           <div className="top__right">
             <NotificationsBell />
             <span className="who"><strong>{user.name || user.email}</strong><small>{user.role.replace('_', ' ')}</small></span>
-            <a className="btn btn--ghost btn--sm" href="/account"><Icon name="account" />Account</a>
+            <Link className="btn btn--ghost btn--sm" href="/account"><Icon name="account" />Account</Link>
             <button type="button" className="btn btn--ghost btn--sm" onClick={async () => { await logout(); router.replace('/login'); }}><Icon name="logout" />Sign out</button>
           </div>
         </header>

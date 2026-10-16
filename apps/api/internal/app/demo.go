@@ -85,6 +85,9 @@ var episodeTitles = []string{
 
 // SeedDemo creates demo tenants (one per theme), podcasts, playable episodes, distribution records and analytics.
 func (a *App) SeedDemo(ctx context.Context) error {
+	if a.Cfg.IsProduction() {
+		return fmt.Errorf("refusing to seed demo data: APP_ENV is %q", a.Cfg.Env)
+	}
 	var exists bool
 	a.DB.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM tenants WHERE slug='podcastbusiness')`).Scan(&exists)
 	if exists {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { get, post } from '@/lib/api';
 import type { Distribution, DistStatus, Platform, Readiness } from '@/lib/types';
@@ -17,12 +17,27 @@ export default function DistributionWizardPage() {
   const platforms = usePlatforms(false);
   const platformMap = useMemo(() => new Map((platforms.data ?? []).map((p) => [p.id, p])), [platforms.data]);
 
+  const initialOrderRef = useRef<number[] | null>(null);
+
   const sorted = useMemo(() => {
     if (!data) return [];
-    return [...data.platforms].sort((a, b) => {
-      const order: Record<string, number> = { NOT_STARTED: 0, READY: 1, SUBMITTED: 2, PENDING: 3, PENDING_REVIEW: 4, DISCOVERY_PENDING: 5, LIVE: 6, PAUSED: 7, REJECTED: 8, FAILED: 9, ACTION_REQUIRED: 10, UNAVAILABLE: 11 };
-      return (order[a.status] ?? 99) - (order[b.status] ?? 99);
-    });
+    const order: Record<string, number> = { NOT_STARTED: 0, READY: 1, SUBMITTED: 2, PENDING: 3, PENDING_REVIEW: 4, DISCOVERY_PENDING: 5, LIVE: 6, PAUSED: 7, REJECTED: 8, FAILED: 9, ACTION_REQUIRED: 10, UNAVAILABLE: 11 };
+    if (!initialOrderRef.current) {
+      // First load: sort by status and store the platform_id order
+      const initial = [...data.platforms].sort((a, b) => (order[a.status] ?? 99) - (order[b.status] ?? 99));
+      initialOrderRef.current = initial.map((p) => p.platform_id);
+      return initial;
+    }
+    // Subsequent reloads: preserve original order, update data in place
+    const byId = new Map(data.platforms.map((p) => [p.platform_id, p]));
+    const result: Distribution[] = [];
+    for (const pid of initialOrderRef.current) {
+      const p = byId.get(pid);
+      if (p) { result.push(p); byId.delete(pid); }
+    }
+    // Append any new platforms not in the original order
+    for (const p of byId.values()) result.push(p);
+    return result;
   }, [data]);
 
   const [stepIdx, setStepIdx] = useState(0);

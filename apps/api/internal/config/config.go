@@ -127,10 +127,13 @@ func Load() *Config {
 		LogLevel:          get("LOG_LEVEL", "info"),
 	}
 	if c.JWTSecret == "" {
-		if c.Env == "production" {
-			panic("JWT_SECRET must be set in production")
+		switch c.Env {
+		case "development", "dev", "test", "":
+			c.JWTSecret = "dev-only-insecure-secret-change-me"
+		default:
+			// production, staging, prod, and any other/typo value must have JWT_SECRET set.
+			panic("JWT_SECRET must be set when APP_ENV=" + c.Env)
 		}
-		c.JWTSecret = "dev-only-insecure-secret-change-me"
 	}
 	if c.RevalidateSecret == "" {
 		c.RevalidateSecret = c.JWTSecret + ":revalidate"

@@ -205,8 +205,23 @@ func (s *Server) updateTenant(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) deleteTenant(w http.ResponseWriter, r *http.Request) {
 	id := idParam(r, "id")
-	s.App.InvalidateDomains(r.Context(), id)
-	tag, err := s.App.DB.Exec(r.Context(), `DELETE FROM tenants WHERE id=$1`, id)
+	ctx := r.Context()
+
+	// Before deleting the tenant, archive all podcasts it owns so they don't
+	// become orphaned (NULL owner_tenant_id) and leak into SHARED tenant feeds.
+	// 1. Archive owned podcasts and set owner_tenant_id=NULL (archived podcasts
+	//    are excluded from feeds, so NULL owner is safe).
+	_, err := s.App.DB.Exec(ctx,
+		`UPDATE podcasts SET status='ARCHIVED', owner_tenant_id=NULL, updated_at=now() WHERE owner_tenant_id=$1`, id)
+	if err != nil {
+		s.serverError(w, r, err)
+		return
+	}
+	// 2. Remove all tenant_podcasts rows linking podcasts to this tenant.
+	s.App.DB.Exec(ctx, `DELETE FROM tenant_podcasts WHERE tenant_id=$1`, id)
+
+	s.App.InvalidateDomains(ctx, id)
+	tag, err := s.App.DB.Exec(ctx, `DELETE FROM tenants WHERE id=$1`, id)
 	if err != nil {
 		s.serverError(w, r, err)
 		return

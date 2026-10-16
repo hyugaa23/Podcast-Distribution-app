@@ -137,26 +137,54 @@ func (q *Queue) Reserve(ctx context.Context, workerID string, timeout time.Durat
 	return &job, b, nil
 }
 
+var ackScript = redis.NewScript(`
+redis.call('LREM', KEYS[1], 1, ARGV[1])
+if KEYS[2] ~= '' then redis.call('DEL', KEYS[2]) end
+return 1`)
+
 // Ack removes a finished job from the processing list and releases its uniqueness lock.
 func (q *Queue) Ack(ctx context.Context, workerID string, job *Job, raw []byte) {
-	q.rdb.LRem(ctx, keyProcessing+workerID, 1, raw)
+	uniqueKey := ""
 	if job.UniqueKey != "" {
-		q.rdb.Del(ctx, keyUnique+job.UniqueKey)
+		uniqueKey = keyUnique + job.UniqueKey
 	}
+	ackScript.Run(ctx, q.rdb, []string{keyProcessing + workerID, uniqueKey}, raw)
 }
+
+var retryScript = redis.NewScript(`
+redis.call('LREM', KEYS[1], 1, ARGV[1])
+if tonumber(ARGV[3]) > 0 then
+  redis.call('ZADD', KEYS[2], ARGV[2], ARGV[4])
+else
+  redis.call('LPUSH', KEYS[3], ARGV[4])
+end
+return 1`)
+
+var retryExhaustedScript = redis.NewScript(`
+redis.call('LREM', KEYS[1], 1, ARGV[1])
+if KEYS[2] ~= '' then redis.call('DEL', KEYS[2]) end
+return 1`)
 
 // Retry re-schedules a failed job with exponential backoff. Returns false if attempts are exhausted.
 func (q *Queue) Retry(ctx context.Context, workerID string, job *Job, raw []byte) bool {
-	q.rdb.LRem(ctx, keyProcessing+workerID, 1, raw)
 	job.Attempts++
 	if job.Attempts >= job.MaxAttempts {
+		uniqueKey := ""
 		if job.UniqueKey != "" {
-			q.rdb.Del(ctx, keyUnique+job.UniqueKey)
+			uniqueKey = keyUnique + job.UniqueKey
 		}
+		retryExhaustedScript.Run(ctx, q.rdb, []string{keyProcessing + workerID, uniqueKey}, raw)
 		return false
 	}
 	backoff := time.Duration(1<<job.Attempts) * 15 * time.Second
-	q.push(ctx, job, backoff)
+	newRaw, _ := json.Marshal(job)
+	delayMs := int64(backoff / time.Millisecond)
+	score := float64(time.Now().Add(backoff).UnixMilli())
+	err := retryScript.Run(ctx, q.rdb, []string{keyProcessing + workerID, keyDelayed, keyReady},
+		raw, score, delayMs, newRaw).Err()
+	if err != nil {
+		return false
+	}
 	return true
 }
 

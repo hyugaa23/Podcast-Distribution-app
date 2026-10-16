@@ -53,13 +53,32 @@ func (a *App) afterEpisodePublished(ctx context.Context, episodeID, podcastID in
 }
 
 // ScheduleEpisode schedules publication at a UTC instant (PRD §86).
+// Only DRAFT or PROCESSING episodes may be scheduled.
 func (a *App) ScheduleEpisode(ctx context.Context, episodeID int64, at time.Time) error {
 	if at.Before(time.Now()) {
 		return fmt.Errorf("schedule time must be in the future")
 	}
-	var status string
-	if err := a.DB.QueryRow(ctx, `SELECT status FROM episodes WHERE id=$1`, episodeID).Scan(&status); err != nil {
+	var status, audioURL string
+	var audioFileID *int64
+	if err := a.DB.QueryRow(ctx, `SELECT status, COALESCE(audio_url,''), audio_file_id FROM episodes WHERE id=$1`, episodeID).Scan(&status, &audioURL, &audioFileID); err != nil {
 		return err
+	}
+	// Only DRAFT or PROCESSING episodes can be scheduled.
+	switch status {
+	case EpisodeDraft, EpisodeProcessing:
+		// allowed
+	case EpisodePublished:
+		return fmt.Errorf("cannot schedule a published episode; unpublish it first")
+	case EpisodeArchived:
+		return fmt.Errorf("cannot schedule an archived episode")
+	case EpisodeFailed:
+		return fmt.Errorf("cannot schedule an episode with failed audio; re-upload audio first")
+	default:
+		return fmt.Errorf("episode cannot be scheduled from status %s", status)
+	}
+	// Require audio: either already processed or currently processing.
+	if audioURL == "" && audioFileID == nil {
+		return fmt.Errorf("episode must have audio before scheduling; upload audio first")
 	}
 	newStatus := EpisodeScheduled
 	if status == EpisodeProcessing {

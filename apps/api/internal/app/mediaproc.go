@@ -120,16 +120,19 @@ func (a *App) ProcessAudio(ctx context.Context, audioFileID int64) error {
 
 	if af.EpisodeID != nil {
 		var status string
-		var scheduledAt *time.Time
-		var wantPublish bool
-		a.DB.QueryRow(ctx, `SELECT status, scheduled_at, published_at IS NOT NULL FROM episodes WHERE id=$1`,
-			*af.EpisodeID).Scan(&status, &scheduledAt, &wantPublish)
-		next := EpisodeDraft
-		switch {
-		case scheduledAt != nil: // scheduled, or "publish when ready" (scheduled_at in the past → next scheduler tick)
-			next = EpisodeScheduled
-		case status == EpisodePublished || wantPublish:
+		a.DB.QueryRow(ctx, `SELECT status FROM episodes WHERE id=$1`,
+			*af.EpisodeID).Scan(&status)
+		// Determine next status based on the episode's CURRENT status, not published_at.
+		// Only auto-publish if the episode was in PROCESSING state (intentional publish flow).
+		// DRAFT, SCHEDULED, and other states keep their current status.
+		next := status
+		switch status {
+		case EpisodeProcessing:
 			next = EpisodePublished
+		case EpisodeScheduled:
+			next = EpisodeScheduled // keep scheduled; the scheduler tick will publish it
+		case EpisodeDraft, EpisodeFailed:
+			next = EpisodeDraft
 		}
 		_, err = a.DB.Exec(ctx, `UPDATE episodes SET audio_url=$2, audio_size=$3, audio_mime='audio/mpeg', duration=$4,
 			status=$5, processing_error='', updated_at=now() WHERE id=$1 AND audio_file_id=$6`,

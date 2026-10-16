@@ -62,7 +62,16 @@ func StripTags(s string) string {
 }
 
 // PlainText sanitizes a value that must never contain markup.
-func PlainText(s string) string { return strings.TrimSpace(strictPolicy.Sanitize(s)) }
+// It strips HTML tags but does NOT HTML-escape the result — stored text is raw text,
+// and output escaping happens at render time (RSS, JSON, etc.).
+func PlainText(s string) string {
+	s = strings.TrimSpace(s)
+	if s == "" {
+		return s
+	}
+	s = strictPolicy.Sanitize(s)
+	return html.UnescapeString(s)
+}
 
 // Truncate shortens s to n runes on a word boundary.
 func Truncate(s string, n int) string {

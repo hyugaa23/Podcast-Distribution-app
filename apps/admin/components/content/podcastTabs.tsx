@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { del, get, list, post, put, uploadFile } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import type { Episode, HealthCheck, Podcast, Readiness } from '@/lib/types';
@@ -12,7 +12,7 @@ import { CategorySelects, HostsEditor, PODCAST_STATUSES, Section, useCategories,
 import { PodcastDetailsFields, PodcastOwnerFields, draftToBody, podcastToDraft, type PodcastDraft } from './podcastForm';
 
 // ---------------------------------------------------------------- Details
-export function DetailsTab({ p, onSaved, onDeleted }: { p: Podcast; onSaved: (p: Podcast) => void; onDeleted: () => void }) {
+export function DetailsTab({ p, onSaved, onDeleted, onDirtyChange }: { p: Podcast; onSaved: (p: Podcast) => void; onDeleted: () => void; onDirtyChange?: (dirty: boolean) => void }) {
   const { can, tenants } = useAuth();
   const isSuper = can('SUPER_ADMIN');
   const tz = useOwnerTimezone(p.owner_tenant_id);
@@ -21,6 +21,17 @@ export function DetailsTab({ p, onSaved, onDeleted }: { p: Podcast; onSaved: (p:
   const { run, busy } = useAction();
   const set = <K extends keyof PodcastDraft>(k: K, v: PodcastDraft[K]) => { setD((x) => ({ ...x, [k]: v })); setDirty(true); };
   const ro = !p.can_edit;
+
+  useEffect(() => {
+    onDirtyChange?.(dirty)
+  }, [dirty, onDirtyChange])
+
+  useEffect(() => {
+    if (!dirty) return
+    const handler = (e: BeforeUnloadEvent) => { e.preventDefault() }
+    window.addEventListener('beforeunload', handler)
+    return () => window.removeEventListener('beforeunload', handler)
+  }, [dirty])
 
   const save = async () => {
     if (!d.title.trim()) return;

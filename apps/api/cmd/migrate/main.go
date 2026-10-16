@@ -40,6 +40,10 @@ func main() {
 		os.Exit(1)
 	}
 	if *demo {
+		if cfg.IsProduction() {
+			log.Error("-demo flag is not allowed in production (APP_ENV=" + cfg.Env + ")")
+			os.Exit(1)
+		}
 		if err := a.SeedDemo(ctx); err != nil {
 			log.Error("demo seed failed", "err", err)
 			os.Exit(1)
