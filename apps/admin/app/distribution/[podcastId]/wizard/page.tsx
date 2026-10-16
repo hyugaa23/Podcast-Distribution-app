@@ -82,7 +82,7 @@ export default function DistributionWizardPage() {
         </Card>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: 16, alignItems: 'start' }}>
+      <div className="distribution-wizard">
         <div className="card" style={{ padding: 0 }}>
           <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--line)' }}>
             <strong>Platforms</strong>

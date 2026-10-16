@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useState, type FormEvent } from 'react';
+import { Suspense, useEffect, useRef, useState, type FormEvent } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { download, list, post } from '@/lib/api';
 import { useAuth, useTenantQuery } from '@/lib/auth';
@@ -34,10 +34,16 @@ function EpisodesList() {
   const rows = data?.data ?? [];
   const allSelected = rows.length > 0 && rows.every((e) => selected.has(e.id));
   const resetPage = () => { setPage(1); setSelected(new Set()); };
+  const previousScope = useRef(scopeTenantId);
+  useEffect(() => {
+    if (previousScope.current === scopeTenantId) return;
+    previousScope.current = scopeTenantId;
+    setPage(1); setSelected(new Set()); setPodcast(''); setAction(''); setResult(null);
+  }, [scopeTenantId]);
   const toggle = (id: number) => setSelected((s) => { const n = new Set(s); if (n.has(id)) n.delete(id); else n.add(id); return n; });
 
   const applyBulk = async () => {
-    if (!action || !selected.size) return;
+    if (loading || !action || !selected.size) return;
     if (action === 'delete' && !window.confirm(`Delete ${selected.size} episode(s)? This cannot be undone.`)) return;
     const r = await run(() => post<{ ok: number[]; skipped: number[] }>('/episodes/bulk', { action, ids: [...selected] }), 'Bulk action applied');
     if (r) { setResult(r); setSelected(new Set()); setAction(''); reload(); }
@@ -75,7 +81,7 @@ function EpisodesList() {
           <Select label="Bulk action" value={action} onChange={(e) => setAction(e.target.value as BulkAction)}
             options={[{ value: '', label: '— Choose action —' }, { value: 'publish', label: 'Publish' }, { value: 'unpublish', label: 'Unpublish (back to draft)' },
               { value: 'archive', label: 'Archive' }, { value: 'delete', label: 'Delete' }]} />
-          <Button variant={action === 'delete' ? 'danger' : 'primary'} onClick={applyBulk} loading={busy} disabled={!action}>Apply</Button>
+          <Button variant={action === 'delete' ? 'danger' : 'primary'} onClick={applyBulk} loading={busy} disabled={loading || !action}>Apply</Button>
           <Button variant="ghost" onClick={() => setSelected(new Set())}>Clear selection</Button>
           <p className="hint" style={{ flexBasis: '100%' }}>Episodes without audio can’t be published and will be skipped.</p>
         </div>

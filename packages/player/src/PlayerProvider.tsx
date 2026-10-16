@@ -2,6 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import type { AnalyticsEventType, PlayerTrack } from '@podcast/types';
+import { PLAYBACK_SPEEDS } from '@podcast/config';
 
 export interface PlayerState {
   track: PlayerTrack | null;
@@ -40,7 +41,10 @@ const STORE_KEY = 'pe-player';
 function loadPrefs(): { volume: number; rate: number } {
   try {
     const v = JSON.parse(localStorage.getItem(STORE_KEY) || '{}');
-    return { volume: typeof v.volume === 'number' ? v.volume : 1, rate: typeof v.rate === 'number' ? v.rate : 1 };
+    return {
+      volume: Number.isFinite(v?.volume) ? Math.max(0, Math.min(1, v.volume)) : 1,
+      rate: PLAYBACK_SPEEDS.includes(v?.rate) ? v.rate : 1,
+    };
   } catch {
     return { volume: 1, rate: 1 };
   }
@@ -107,8 +111,9 @@ export function PlayerProvider({ children, onEvent }: { children: ReactNode; onE
         setState((s) => ({ ...s, track, currentTime: 0, duration: track.duration || 0, error: null, buffering: true }));
         updateMediaSession(track);
       }
+      const requestedTrack = trackRef.current;
       a.play().catch((err) => {
-        if (err?.name !== 'AbortError') setState((s) => ({ ...s, error: 'Playback failed. Please try again.', playing: false }));
+        if (err?.name !== 'AbortError' && trackRef.current === requestedTrack) setState((s) => ({ ...s, error: 'Playback failed. Please try again.', playing: false, buffering: false }));
       });
     },
     [state.rate, updateMediaSession],
@@ -174,7 +179,9 @@ export function PlayerProvider({ children, onEvent }: { children: ReactNode; onE
       a.load();
     }
     trackRef.current = null;
-    setState((s) => ({ ...s, track: null, playing: false, currentTime: 0, duration: 0 }));
+    if (seekTimer.current) clearTimeout(seekTimer.current);
+    if (typeof navigator !== 'undefined' && 'mediaSession' in navigator) navigator.mediaSession.metadata = null;
+    setState((s) => ({ ...s, track: null, playing: false, buffering: false, error: null, currentTime: 0, duration: 0 }));
   }, []);
 
   const trackDownload = useCallback((t: PlayerTrack) => onEventRef.current?.('DOWNLOAD', t, 0), []);

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { download, list, post } from '@/lib/api';
 import { useAuth, useTenantQuery } from '@/lib/auth';
 import type { Podcast } from '@/lib/types';
@@ -40,13 +40,16 @@ export default function PodcastsPage() {
   const allSelected = editable.length > 0 && editable.every((p) => selected.has(p.id));
 
   const resetPage = () => { setPage(1); setSelected(new Set()); };
+  useEffect(() => {
+    setPage(1); setSelected(new Set()); setAction(''); setResult(null);
+  }, [scopeTenantId]);
   const onSearch = (e: FormEvent) => { e.preventDefault(); setQ(qInput.trim()); resetPage(); };
 
   const toggle = (id: number) => setSelected((s) => { const n = new Set(s); if (n.has(id)) n.delete(id); else n.add(id); return n; });
   const toggleAll = () => setSelected(allSelected ? new Set() : new Set(editable.map((p) => p.id)));
 
   const applyBulk = async () => {
-    if (!action || selected.size === 0) return;
+    if (loading || !action || selected.size === 0) return;
     if (action === 'category' && !bulkCat) return;
     if (action === 'assign_tenants' && bulkTenants.size === 0) return;
     if (action === 'delete' && !window.confirm(`Delete ${selected.size} podcast(s) and all their episodes? This cannot be undone.`)) return;
@@ -134,7 +137,7 @@ export default function PodcastsPage() {
             </fieldset>
           )}
           <Button variant={action === 'delete' ? 'danger' : 'primary'} onClick={applyBulk} loading={busy}
-            disabled={!action || (action === 'category' && !bulkCat) || (action === 'assign_tenants' && bulkTenants.size === 0)}>Apply</Button>
+            disabled={loading || !action || (action === 'category' && !bulkCat) || (action === 'assign_tenants' && bulkTenants.size === 0)}>Apply</Button>
           <Button variant="ghost" onClick={() => setSelected(new Set())}>Clear selection</Button>
         </div>
       )}

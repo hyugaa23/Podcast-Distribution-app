@@ -1,0 +1,11 @@
+[Unit]
+Description=Podcast Platform database backup
+After=postgresql.service
+
+[Service]
+Type=oneshot
+User=postgres
+WorkingDirectory=/tmp
+# Provision once: install -d -o postgres -g postgres -m 700 /var/backups/podcast-platform
+# Keep dumps outside /opt/podcast: postgres cannot traverse that application's private directory.
+ExecStart=/bin/sh -c 'set -e; f=/var/backups/podcast-platform/podcast-$(date +%%Y%%m%%d-%%H%%M%%S).dump; pg_dump --format=custom podcast > "$f" || { rm -f -- "$f"; exit 1; }; ls -1t /var/backups/podcast-platform/podcast-*.dump | tail -n +15 | xargs -r rm --'

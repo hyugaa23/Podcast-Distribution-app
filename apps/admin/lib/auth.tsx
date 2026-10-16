@@ -37,7 +37,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const applySession = useCallback((d: SessionData | null) => {
     setUser(d?.user ?? null);
     if (d?.user.role === 'SUPER_ADMIN') {
-      const saved = typeof window !== 'undefined' ? window.localStorage.getItem(SCOPE_KEY) : null;
+      let saved: string | null = null;
+      try { saved = window.localStorage.getItem(SCOPE_KEY); } catch { /* storage unavailable */ }
       setScope(saved ? Number(saved) || null : null);
     } else {
       setScope(d?.user.tenant_id ?? null);
@@ -50,6 +51,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         applySession(d);
         if (d) await reloadTenants();
       })
+      .catch(() => applySession(null))
       .finally(() => setReady(true));
     return onSessionExpired(() => {
       setAccessToken(null);

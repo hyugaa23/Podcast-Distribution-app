@@ -65,7 +65,7 @@ function NewEpisode() {
             <Input label="Title" required value={title} onChange={(e) => setTitle(e.target.value)} maxLength={255} />
             <Textarea label="Description" rows={5} value={description} onChange={(e) => setDescription(e.target.value)} hint="Basic HTML allowed. You can edit everything later." />
             <div className="grid-3">
-              <Input label="Episode number" type="number" min={0} value={episodeNumber} onChange={(e) => setEpisodeNumber(e.target.value)}
+              <Input label="Episode number" type="number" min={1} step={1} value={episodeNumber} onChange={(e) => setEpisodeNumber(e.target.value)}
                 hint={suggested ? `Next would be ${suggested}` : undefined} />
               <Input label="Season number" type="number" min={0} value={seasonNumber} onChange={(e) => setSeasonNumber(e.target.value)} />
               <Select label="Episode type" value={type} onChange={(e) => setType(e.target.value as Episode['episode_type'])}

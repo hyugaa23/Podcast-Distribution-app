@@ -137,6 +137,7 @@ export default function EpisodeEditorPage() {
   const preview = async () => {
     const w = window.open('', '_blank');
     try {
+      if (dirty && !(await save(true))) { w?.close(); return; }
       const r = await post<{ token: string; url: string }>(`/episodes/${ep.id}/preview-token`);
       if (w) { w.opener = null; w.location.href = r.url; } else window.location.assign(r.url);
       setPreviewed(true);
@@ -200,7 +201,7 @@ export default function EpisodeEditorPage() {
                   hint="Allowed: p, a, strong, em, ul, ol, li, h2–h4, blockquote. Used in the RSS feed." />
                 <Textarea label="Show notes" rows={6} value={d.show_notes} onChange={(e) => set('show_notes', e.target.value)} hint="Links, timestamps and resources (HTML allowed)." />
                 <div className="grid-3">
-                  <Input label="Episode number" type="number" min={0} value={d.episode_number} onChange={(e) => set('episode_number', e.target.value)} />
+                  <Input label="Episode number" type="number" min={1} step={1} value={d.episode_number} onChange={(e) => set('episode_number', e.target.value)} />
                   <Input label="Season number" type="number" min={0} value={d.season_number} onChange={(e) => set('season_number', e.target.value)} />
                   <Select label="Episode type" value={d.episode_type} onChange={(e) => set('episode_type', e.target.value as Episode['episode_type'])}
                     options={[{ value: 'full', label: 'Full' }, { value: 'trailer', label: 'Trailer' }, { value: 'bonus', label: 'Bonus' }]} />

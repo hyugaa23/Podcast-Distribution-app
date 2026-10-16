@@ -51,8 +51,8 @@ export function refreshSession(): Promise<SessionData | null> {
 }
 
 async function doRefresh(): Promise<SessionData | null> {
-  const res = await fetch('/api/auth/refresh', { method: 'POST', headers: { 'X-Requested-With': 'fetch' }, credentials: 'same-origin' });
-  if (!res.ok) return null;
+  const res = await fetch('/api/auth/refresh', { method: 'POST', headers: { 'X-Requested-With': 'fetch' }, credentials: 'same-origin', signal: AbortSignal.timeout(30000) });
+  if (!res.ok) { accessToken = null; return null; }
   const body = (await res.json()) as { data: SessionData };
   accessToken = body.data.access_token;
   return body.data;
@@ -97,7 +97,7 @@ export async function api<T = unknown>(path: string, opts: { method?: string; bo
     if (await tryRefresh()) res = await doFetch();
     else listeners.forEach((l) => l());
   }
-  if (opts.raw) return res as unknown as T;
+  if (opts.raw && res.ok) return res as unknown as T;
   const text = await res.text();
   let json: any;
   try {
@@ -160,6 +160,7 @@ export async function uploadFile(
   await new Promise<void>((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     xhr.open(init.method, init.url);
+    xhr.timeout = 30 * 60 * 1000;
     for (const [k, v] of Object.entries(init.headers)) xhr.setRequestHeader(k, v);
     xhr.upload.onprogress = (e) => e.lengthComputable && onProgress?.(e.loaded / e.total);
     xhr.onload = () => {
@@ -171,6 +172,8 @@ export async function uploadFile(
       }
     };
     xhr.onerror = () => reject(new Error('Network error during upload'));
+    xhr.ontimeout = () => reject(new Error('Upload timed out. Please try again.'));
+    xhr.onabort = () => reject(new Error('Upload cancelled.'));
     xhr.send(file);
   });
   return post(`/uploads/${init.upload_id}/complete`);
