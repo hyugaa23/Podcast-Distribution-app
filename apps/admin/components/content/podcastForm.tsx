@@ -52,7 +52,10 @@ export function PodcastDetailsFields({ d, set, slugHint }: { d: PodcastDraft; se
     <>
       <div className="grid-2">
         <Input label="Title" required value={d.title} onChange={(e) => set('title', e.target.value)} maxLength={255} />
-        <Input label="Slug" value={d.slug} onChange={(e) => set('slug', e.target.value)} placeholder="auto-generated from title"
+        <Input label="Slug" value={d.slug} onChange={(e) => {
+            const val = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '');
+            set('slug', val);
+          }} pattern="[a-z0-9-]+" placeholder="auto-generated from title"
           hint={slugHint ?? 'Optional. Lowercase letters, numbers and dashes.'} />
       </div>
       <Input label="Short description" value={d.short_description} onChange={(e) => set('short_description', e.target.value)} maxLength={300}

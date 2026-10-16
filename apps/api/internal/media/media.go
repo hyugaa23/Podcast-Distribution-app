@@ -73,8 +73,8 @@ type probeOut struct {
 }
 
 func (t Tool) probe(ctx context.Context, path string) (*probeOut, error) {
-	cmd := exec.CommandContext(ctx, t.FFprobe, "-v", "error", "-print_format", "json",
-		"-show_format", "-show_streams", path)
+	cmd := exec.CommandContext(ctx, t.FFprobe, "-v", "error", "-protocol_whitelist", "file,pipe",
+		"-print_format", "json", "-show_format", "-show_streams", path)
 	var stderr bytes.Buffer
 	cmd.Stderr = &stderr
 	out, err := cmd.Output()
@@ -145,7 +145,7 @@ func (t Tool) TranscodeMP3(ctx context.Context, in, out string, kbps int, normal
 	if kbps > 192 {
 		kbps = 192
 	}
-	args := []string{"-hide_banner", "-loglevel", "error", "-y", "-i", in, "-vn", "-map_metadata", "-1"}
+	args := []string{"-hide_banner", "-loglevel", "error", "-y", "-protocol_whitelist", "file,pipe", "-i", in, "-vn", "-map_metadata", "-1"}
 	if normalize {
 		args = append(args, "-af", "loudnorm=I=-16:TP=-1.5:LRA=11")
 	}
@@ -182,7 +182,8 @@ var ImageVariants = []struct {
 // ResizeWebP produces a WebP variant bounded by size x size.
 func (t Tool) ResizeWebP(ctx context.Context, in, out string, size int) error {
 	vf := fmt.Sprintf("scale='min(%d,iw)':'min(%d,ih)':force_original_aspect_ratio=decrease", size, size)
-	cmd := exec.CommandContext(ctx, t.FFmpeg, "-hide_banner", "-loglevel", "error", "-y", "-i", in,
+	cmd := exec.CommandContext(ctx, t.FFmpeg, "-hide_banner", "-loglevel", "error", "-y",
+		"-protocol_whitelist", "file,pipe", "-i", in,
 		"-vf", vf, "-frames:v", "1", "-c:v", "libwebp", "-quality", "82", out)
 	var stderr bytes.Buffer
 	cmd.Stderr = &stderr
@@ -195,7 +196,8 @@ func (t Tool) ResizeWebP(ctx context.Context, in, out string, size int) error {
 // ToJPEG converts any decodable image to JPEG (used for RSS artwork compatibility).
 func (t Tool) ToJPEG(ctx context.Context, in, out string, maxSize int) error {
 	vf := fmt.Sprintf("scale='min(%d,iw)':'min(%d,ih)':force_original_aspect_ratio=decrease", maxSize, maxSize)
-	cmd := exec.CommandContext(ctx, t.FFmpeg, "-hide_banner", "-loglevel", "error", "-y", "-i", in,
+	cmd := exec.CommandContext(ctx, t.FFmpeg, "-hide_banner", "-loglevel", "error", "-y",
+		"-protocol_whitelist", "file,pipe", "-i", in,
 		"-vf", vf, "-frames:v", "1", "-q:v", "3", out)
 	var stderr bytes.Buffer
 	cmd.Stderr = &stderr

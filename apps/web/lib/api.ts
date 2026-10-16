@@ -28,6 +28,7 @@ async function fetchJSON<T>(path: string, init?: { revalidate?: number }): Promi
   const res = await fetch(`${API}/api/public${path}`, {
     headers: { 'x-tenant-host': host, accept: 'application/json' },
     next: { revalidate: init?.revalidate ?? 30, tags: [`tenant-${tenantId}`] },
+    signal: AbortSignal.timeout(10000),
   });
   if (res.status === 404) throw new NotFoundError(path);
   if (!res.ok) throw new Error(`API ${path} failed with ${res.status}`);

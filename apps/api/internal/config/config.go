@@ -92,7 +92,7 @@ func Load() *Config {
 		JWTSecret:       get("JWT_SECRET", ""),
 		AccessTokenTTL:  getDuration("ACCESS_TOKEN_TTL", 15*time.Minute),
 		RefreshTokenTTL: getDuration("REFRESH_TOKEN_TTL", 30*24*time.Hour),
-		CookieSecure:    getBool("COOKIE_SECURE", false),
+		CookieSecure:    getBool("COOKIE_SECURE", get("APP_ENV", "development") == "production" || get("APP_ENV", "development") == "prod" || get("APP_ENV", "development") == "staging"),
 
 		AppURL:           strings.TrimRight(get("APP_URL", "http://localhost:3001"), "/"),
 		APIPublicURL:     strings.TrimRight(get("API_PUBLIC_URL", "http://localhost:8080"), "/"),
@@ -141,7 +141,13 @@ func Load() *Config {
 	return c
 }
 
-func (c *Config) IsProduction() bool { return c.Env == "production" }
+func (c *Config) IsProduction() bool {
+	switch c.Env {
+	case "production", "prod", "staging":
+		return true
+	}
+	return false
+}
 
 func get(key, def string) string {
 	if v, ok := os.LookupEnv(key); ok && v != "" {

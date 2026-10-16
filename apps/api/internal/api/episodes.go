@@ -108,8 +108,14 @@ func (in *episodeInput) normalize() string {
 			return "VTT transcripts must start with WEBVTT"
 		}
 	}
-	if in.EpisodeNumber != nil && *in.EpisodeNumber < 0 || in.SeasonNumber != nil && *in.SeasonNumber < 0 {
-		return "Episode and season numbers must be positive"
+	if in.EpisodeNumber != nil && *in.EpisodeNumber <= 0 {
+		return "Episode number must be positive"
+	}
+	if in.SeasonNumber != nil && *in.SeasonNumber < 0 {
+		return "Season number must not be negative"
+	}
+	if in.EpisodeNumber != nil && *in.EpisodeNumber > 99999 || in.SeasonNumber != nil && *in.SeasonNumber > 99999 {
+		return "Episode and season numbers must be under 100000"
 	}
 	if in.Status != nil {
 		switch *in.Status {
@@ -184,6 +190,13 @@ func (s *Server) createEpisode(w http.ResponseWriter, r *http.Request) {
 		badRequest(w, msg)
 		return
 	}
+	if in.Title != nil && len(*in.Title) > 500 { badRequest(w, "title must be under 500 characters"); return }
+	if in.ShortDescription != nil && len(*in.ShortDescription) > 300 { badRequest(w, "short_description must be under 300 characters"); return }
+	if in.Description != nil && len(*in.Description) > 50000 { badRequest(w, "description must be under 50000 characters"); return }
+	if in.ShowNotes != nil && len(*in.ShowNotes) > 100000 { badRequest(w, "show_notes must be under 100000 characters"); return }
+	if in.SEOTitle != nil && len(*in.SEOTitle) > 200 { badRequest(w, "seo_title must be under 200 characters"); return }
+	if in.MetaDescription != nil && len(*in.MetaDescription) > 500 { badRequest(w, "meta_description must be under 500 characters"); return }
+	if in.CanonicalURL != nil && len(*in.CanonicalURL) > 2000 { badRequest(w, "canonical_url must be under 2000 characters"); return }
 	acc, err := s.podcastAccessFor(r.Context(), p, *in.PodcastID)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
@@ -414,6 +427,13 @@ func (s *Server) updateEpisode(w http.ResponseWriter, r *http.Request) {
 		badRequest(w, msg)
 		return
 	}
+	if in.Title != nil && len(*in.Title) > 500 { badRequest(w, "title must be under 500 characters"); return }
+	if in.ShortDescription != nil && len(*in.ShortDescription) > 300 { badRequest(w, "short_description must be under 300 characters"); return }
+	if in.Description != nil && len(*in.Description) > 50000 { badRequest(w, "description must be under 50000 characters"); return }
+	if in.ShowNotes != nil && len(*in.ShowNotes) > 100000 { badRequest(w, "show_notes must be under 100000 characters"); return }
+	if in.SEOTitle != nil && len(*in.SEOTitle) > 200 { badRequest(w, "seo_title must be under 200 characters"); return }
+	if in.MetaDescription != nil && len(*in.MetaDescription) > 500 { badRequest(w, "meta_description must be under 500 characters"); return }
+	if in.CanonicalURL != nil && len(*in.CanonicalURL) > 2000 { badRequest(w, "canonical_url must be under 2000 characters"); return }
 	cur, err := s.App.EpisodeByID(r.Context(), id)
 	if err != nil {
 		s.serverError(w, r, err)
@@ -534,7 +554,9 @@ func (s *Server) deleteEpisode(w http.ResponseWriter, r *http.Request) {
 		forbidden(w)
 		return
 	}
-	s.App.DB.Exec(r.Context(), `DELETE FROM episodes WHERE id=$1`, id)
+	tag, err := s.App.DB.Exec(r.Context(), `DELETE FROM episodes WHERE id=$1`, id)
+	if err != nil { s.serverError(w, r, err); return }
+	if tag.RowsAffected() == 0 { notFound(w); return }
 	s.App.InvalidatePodcast(r.Context(), podcastID)
 	s.audit(r, "DELETED_EPISODE", "episode", id, acc.Owner, nil)
 	writeData(w, map[string]bool{"ok": true})

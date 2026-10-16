@@ -61,6 +61,16 @@ func esc(s string) string {
 }
 
 func cdata(s string) string {
+	if s == "" {
+		return ""
+	}
+	// Strip invalid XML 1.0 characters
+	s = strings.Map(func(r rune) rune {
+		if r == 0x09 || r == 0x0A || r == 0x0D || (r >= 0x20 && r <= 0xD7FF) || (r >= 0xE000 && r <= 0xFFFD) || (r >= 0x10000 && r <= 0x10FFFF) {
+			return r
+		}
+		return -1
+	}, s)
 	return "<![CDATA[" + strings.ReplaceAll(s, "]]>", "]]]]><![CDATA[>") + "]]>"
 }
 
@@ -96,11 +106,15 @@ func Generate(ch Channel) []byte {
 	if ch.GUID != "" {
 		w("  <podcast:guid>%s</podcast:guid>\n", esc(ch.GUID))
 	}
-	w("  <itunes:author>%s</itunes:author>\n", esc(ch.Author))
+	if ch.Author != "" {
+		w("  <itunes:author>%s</itunes:author>\n", esc(ch.Author))
+	}
 	w("  <itunes:summary>%s</itunes:summary>\n", cdata(ch.Description))
 	w("  <itunes:type>%s</itunes:type>\n", esc(orDefault(ch.Type, "episodic")))
-	w("  <itunes:owner>\n    <itunes:name>%s</itunes:name>\n    <itunes:email>%s</itunes:email>\n  </itunes:owner>\n",
-		esc(ch.OwnerName), esc(ch.OwnerEmail))
+	if ch.OwnerName != "" || ch.OwnerEmail != "" {
+		w("  <itunes:owner>\n    <itunes:name>%s</itunes:name>\n    <itunes:email>%s</itunes:email>\n  </itunes:owner>\n",
+			esc(ch.OwnerName), esc(ch.OwnerEmail))
+	}
 	if ch.ImageURL != "" {
 		w(`  <itunes:image href="%s"/>`+"\n", esc(ch.ImageURL))
 		w("  <image>\n    <url>%s</url>\n    <title>%s</title>\n    <link>%s</link>\n  </image>\n",

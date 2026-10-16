@@ -210,9 +210,8 @@ func newS3(ctx context.Context, c Config) (*S3, error) {
 		if err := cl.MakeBucket(ctx, c.Bucket, minio.MakeBucketOptions{Region: c.Region}); err != nil {
 			return nil, fmt.Errorf("create bucket: %w", err)
 		}
-		// Public read for published media prefixes so the CDN can serve audio/images directly.
-		policy := fmt.Sprintf(`{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"AWS":["*"]},"Action":["s3:GetObject"],"Resource":["arn:aws:s3:::%[1]s/audio/*","arn:aws:s3:::%[1]s/images/*","arn:aws:s3:::%[1]s/podcasts/*","arn:aws:s3:::%[1]s/episodes/*"]}]}`, c.Bucket)
-		_ = cl.SetBucketPolicy(ctx, c.Bucket, policy)
+		// No blanket public bucket policy — the API's /media/* route and presigned URLs
+		// handle all serving, preventing draft/unprocessed audio from being publicly accessible.
 	}
 	return &S3{client: cl, bucket: c.Bucket, cdn: c.CDNURL}, nil
 }
@@ -226,7 +225,7 @@ func (s *S3) Put(ctx context.Context, key string, r io.Reader, size int64, conte
 	}
 	_, err = s.client.PutObject(ctx, s.bucket, k, r, size, minio.PutObjectOptions{
 		ContentType:  contentType,
-		CacheControl: "public, max-age=31536000, immutable",
+		CacheControl: "public, max-age=86400",
 	})
 	return err
 }

@@ -41,6 +41,7 @@ func (s *Server) Router() http.Handler {
 	r.Use(s.logAndMeasure)
 	r.Use(securityHeaders)
 	r.Use(s.cors)
+	r.Use(middleware.GetHead)
 
 	r.Get("/healthz", func(w http.ResponseWriter, r *http.Request) { writeJSON(w, 200, map[string]string{"status": "ok"}) })
 	r.Get("/readyz", s.readyz)
@@ -86,8 +87,8 @@ func (s *Server) Router() http.Handler {
 			})
 		})
 
-		// Signed local upload target (no bearer token: authorised by HMAC signature).
-		r.Put("/uploads/{id}/data", s.uploadData)
+		// Signed local upload target — longer timeout for large files (no bearer token: authorised by HMAC signature).
+		r.With(middleware.Timeout(30 * time.Minute)).Put("/uploads/{id}/data", s.uploadData)
 
 		// ---------------- Auth ----------------
 		r.Route("/auth", func(r chi.Router) {
@@ -355,10 +356,10 @@ func (s *Server) realIP(next http.Handler) http.Handler {
 		}
 		ip := host
 		if peer := net.ParseIP(host); peer != nil && (peer.IsLoopback() || peer.IsPrivate()) {
-			if cf := r.Header.Get("CF-Connecting-IP"); cf != "" {
-				ip = cf
-			} else if xff := r.Header.Get("X-Forwarded-For"); xff != "" {
+			if xff := r.Header.Get("X-Forwarded-For"); xff != "" {
 				ip = strings.TrimSpace(strings.Split(xff, ",")[0])
+			} else if cf := r.Header.Get("CF-Connecting-IP"); cf != "" {
+				ip = cf
 			} else if xr := r.Header.Get("X-Real-IP"); xr != "" {
 				ip = xr
 			}
@@ -506,7 +507,7 @@ func (s *Server) logAndMeasure(next http.Handler) http.Handler {
 		ww := middleware.NewWrapResponseWriter(w, r.ProtoMajor)
 		next.ServeHTTP(ww, r)
 		d := time.Since(start)
-		route := r.URL.Path
+		route := "404"
 		if rc := chi.RouteContext(r.Context()); rc != nil && rc.RoutePattern() != "" {
 			route = rc.RoutePattern()
 		}

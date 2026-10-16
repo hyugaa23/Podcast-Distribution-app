@@ -41,19 +41,19 @@ function LoginForm() {
         <div className="login-split__hero-content">
           <BrandMark size={56} />
           <h2>Podcast Engine</h2>
-          <p>Kelola, distribusi, dan analisis podcast kamu dari satu dashboard.</p>
+          <p>Manage, distribute, and analyze your podcasts from a single dashboard.</p>
           <div className="login-split__features">
             <div className="login-split__feat">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="2" /><path d="M16.2 7.8a6 6 0 0 1 0 8.4" /><path d="M7.8 16.2a6 6 0 0 1 0-8.4" /></svg>
-              <span>Distribusi ke 10+ platform</span>
+              <span>Distribute to 10+ platforms</span>
             </div>
             <div className="login-split__feat">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18" /><path d="m7 15 4-4 3 3 5-6" /></svg>
-              <span>Analytics real-time</span>
+              <span>Real-time analytics</span>
             </div>
             <div className="login-split__feat">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3a14 14 0 0 1 0 18" /><path d="M12 3a14 14 0 0 0 0 18" /><circle cx="12" cy="12" r="9" /><path d="M3 12h18" /></svg>
-              <span>RSS feed otomatis</span>
+              <span>Automatic RSS feeds</span>
             </div>
           </div>
         </div>
@@ -67,20 +67,20 @@ function LoginForm() {
       <div className="login-split__form-side">
         <form className="login-split__card" onSubmit={submit} aria-labelledby="login-title">
           <div className="login-split__card-head">
-            <h1 id="login-title">Selamat datang</h1>
-            <p>Masuk ke admin dashboard</p>
+            <h1 id="login-title">Welcome back</h1>
+            <p>Sign in to admin dashboard</p>
           </div>
 
           <div className="field">
             <label htmlFor="email">Email</label>
-            <input id="email" type="email" autoComplete="username" required placeholder="nama@email.com" value={email} onChange={(e) => setEmail(e.target.value)} />
+            <input id="email" type="email" autoComplete="username" required placeholder="name@email.com" value={email} onChange={(e) => setEmail(e.target.value)} />
           </div>
 
           <div className="field">
             <label htmlFor="password">Password</label>
             <div className="login-split__pw-wrap">
-              <input id="password" type={showPw ? 'text' : 'password'} autoComplete="current-password" required placeholder="Masukkan password" value={password} onChange={(e) => setPassword(e.target.value)} />
-              <button type="button" className="login-split__pw-toggle" onClick={() => setShowPw(!showPw)} aria-label={showPw ? 'Sembunyikan password' : 'Tampilkan password'}>
+              <input id="password" type={showPw ? 'text' : 'password'} autoComplete="current-password" required placeholder="Enter password" value={password} onChange={(e) => setPassword(e.target.value)} />
+              <button type="button" className="login-split__pw-toggle" onClick={() => setShowPw(!showPw)} aria-label={showPw ? 'Hide password' : 'Show password'}>
                 {showPw ? (
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="m2 2 20 20" /><path d="M6.7 6.7C4.3 8.3 2.7 10.8 2 12c1.7 3.3 5.3 7 10 7 2 0 3.8-.7 5.3-1.7" /><path d="M14 14.2a3 3 0 0 1-4.2-4.2" /><path d="M22 12c-.7-1.2-2.3-3.7-4.7-5.3" /></svg>
                 ) : (
@@ -92,7 +92,7 @@ function LoginForm() {
 
           {error && <p className="alert alert--error" role="alert">{error}</p>}
 
-          <Button type="submit" variant="primary" loading={busy} className="w100">Masuk</Button>
+          <Button type="submit" variant="primary" loading={busy} className="w100">Sign in</Button>
 
           <p className="login-split__footer">Podcast Engine &copy; {new Date().getFullYear()}</p>
         </form>

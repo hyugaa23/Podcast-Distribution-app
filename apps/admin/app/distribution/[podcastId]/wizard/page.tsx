@@ -84,14 +84,14 @@ export default function DistributionWizardPage() {
 
       <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: 16, alignItems: 'start' }}>
         <div className="card" style={{ padding: 0 }}>
-          <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--border)' }}>
+          <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--line)' }}>
             <strong>Platforms</strong>
           </div>
           <nav style={{ maxHeight: 480, overflowY: 'auto' }}>
             {sorted.map((d, i) => (
               <button key={d.platform_id} onClick={() => setStepIdx(i)}
                 className={cx('wizard-step', i === stepIdx && 'is-active')}
-                style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', padding: '10px 16px', border: 'none', background: i === stepIdx ? 'var(--surface-hover)' : 'transparent', cursor: 'pointer', textAlign: 'left', borderLeft: i === stepIdx ? '3px solid var(--primary)' : '3px solid transparent' }}>
+                style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', padding: '10px 16px', border: 'none', background: i === stepIdx ? '#f8fafc' : 'transparent', cursor: 'pointer', textAlign: 'left', borderLeft: i === stepIdx ? '3px solid var(--primary)' : '3px solid transparent' }}>
                 <span style={{ width: 20, textAlign: 'center' }}>{statusSymbol(d.status)}</span>
                 <span style={{ flex: 1 }}><PlatformName name={d.platform_name} color={d.platform_color} /></span>
                 <Badge status={d.status} />

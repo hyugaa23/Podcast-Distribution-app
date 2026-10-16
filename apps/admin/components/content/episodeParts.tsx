@@ -174,7 +174,7 @@ export function TranscriptCard({ ep, transcript, format, onTranscript, onFormat,
         </div>
       )}
       {genMsg && <div className={`alert alert--${genMsg.kind}`} role="status">{genMsg.text}</div>}
-      <p className="muted small" style={{ marginTop: 0 }}>Transcripts improve accessibility, SEO and answer-engine discoverability (PRD §32, §39).</p>
+      <p className="muted small" style={{ marginTop: 0 }}>Transcripts improve accessibility, SEO and answer-engine discoverability.</p>
       <Textarea label="Transcript text" rows={10} value={transcript} onChange={(e) => onTranscript(e.target.value)} readOnly={readOnly} className="mono" />
       <div className="row" style={{ alignItems: 'flex-end' }}>
         <div style={{ width: 160 }}>

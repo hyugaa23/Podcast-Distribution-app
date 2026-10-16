@@ -69,10 +69,16 @@ func Migrate(ctx context.Context, pool *pgxpool.Pool) error {
 		return err
 	}
 	// Serialize concurrent migrators (api + worker starting together).
-	if _, err := pool.Exec(ctx, `SELECT pg_advisory_lock(727274)`); err != nil {
+	// Use a single connection so the session-level advisory lock is held and released on the same session.
+	conn, err := pool.Acquire(ctx)
+	if err != nil {
+		return fmt.Errorf("acquire migration conn: %w", err)
+	}
+	defer conn.Release()
+	if _, err := conn.Exec(ctx, `SELECT pg_advisory_lock(727274)`); err != nil {
 		return err
 	}
-	defer pool.Exec(context.Background(), `SELECT pg_advisory_unlock(727274)`)
+	defer conn.Exec(context.Background(), `SELECT pg_advisory_unlock(727274)`)
 
 	entries, err := fs.ReadDir(migrationsFS, "migrations")
 	if err != nil {

@@ -100,7 +100,10 @@ export default function HostsPage() {
           <form onSubmit={(e) => { e.preventDefault(); save(); }}>
             <div className="grid-2">
               <Input label="Name" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-              <Input label="Slug" value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} placeholder="auto from name" />
+              <Input label="Slug" value={form.slug} onChange={(e) => {
+                const val = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '');
+                setForm({ ...form, slug: val });
+              }} pattern="[a-z0-9-]+" placeholder="auto from name" />
             </div>
             {isSuper && !form.id && (
               <Select label="Owner site" value={form.tenant_id} onChange={(e) => setForm({ ...form, tenant_id: Number(e.target.value) })}

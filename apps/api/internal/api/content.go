@@ -49,6 +49,8 @@ func (s *Server) createCategory(w http.ResponseWriter, r *http.Request) {
 		badRequest(w, "Name is required")
 		return
 	}
+	if len(in.Name) > 200 { badRequest(w, "name must be under 200 characters"); return }
+	if len(in.Description) > 10000 { badRequest(w, "description must be under 10000 characters"); return }
 	if in.Slug == "" {
 		in.Slug = in.Name
 	}
@@ -77,6 +79,8 @@ func (s *Server) updateCategory(w http.ResponseWriter, r *http.Request) {
 		badRequest(w, "Name is required")
 		return
 	}
+	if len(in.Name) > 200 { badRequest(w, "name must be under 200 characters"); return }
+	if len(in.Description) > 10000 { badRequest(w, "description must be under 10000 characters"); return }
 	if in.ParentID != nil && *in.ParentID == id {
 		badRequest(w, "A category cannot be its own parent")
 		return
@@ -104,10 +108,12 @@ func (s *Server) updateCategory(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) deleteCategory(w http.ResponseWriter, r *http.Request) {
 	id := idParam(r, "id")
-	if _, err := s.App.DB.Exec(r.Context(), `DELETE FROM categories WHERE id=$1`, id); err != nil {
+	tag, err := s.App.DB.Exec(r.Context(), `DELETE FROM categories WHERE id=$1`, id)
+	if err != nil {
 		s.serverError(w, r, err)
 		return
 	}
+	if tag.RowsAffected() == 0 { notFound(w); return }
 	s.App.Cache.DelPrefix(r.Context(), "t:")
 	s.audit(r, "DELETED_CATEGORY", "category", id, nil, nil)
 	writeData(w, map[string]bool{"ok": true})
@@ -211,6 +217,8 @@ func (in *hostInput) normalize() string {
 	if in.Name == "" {
 		return "Name is required"
 	}
+	if len(in.Name) > 200 { return "name must be under 200 characters" }
+	if len(in.Bio) > 10000 { return "bio must be under 10000 characters" }
 	if _, ok := cleanURL(&in.PhotoURL); !ok {
 		return "photo_url must be a URL"
 	}
@@ -334,7 +342,9 @@ func (s *Server) deleteHost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	s.invalidateHost(r, id)
-	s.App.DB.Exec(r.Context(), `DELETE FROM hosts WHERE id=$1`, id)
+	tag, err := s.App.DB.Exec(r.Context(), `DELETE FROM hosts WHERE id=$1`, id)
+	if err != nil { s.serverError(w, r, err); return }
+	if tag.RowsAffected() == 0 { notFound(w); return }
 	s.audit(r, "DELETED_HOST", "host", id, owner, nil)
 	writeData(w, map[string]bool{"ok": true})
 }
@@ -403,6 +413,8 @@ func (s *Server) createCollection(w http.ResponseWriter, r *http.Request) {
 		badRequest(w, "title and tenant_id are required")
 		return
 	}
+	if len(in.Title) > 200 { badRequest(w, "title must be under 200 characters"); return }
+	if len(in.Description) > 10000 { badRequest(w, "description must be under 10000 characters"); return }
 	if _, ok := cleanURL(&in.CoverURL); !ok {
 		badRequest(w, "cover_url must be a URL")
 		return
@@ -446,6 +458,8 @@ func (s *Server) updateCollection(w http.ResponseWriter, r *http.Request) {
 		badRequest(w, "title is required")
 		return
 	}
+	if len(in.Title) > 200 { badRequest(w, "title must be under 200 characters"); return }
+	if len(in.Description) > 10000 { badRequest(w, "description must be under 10000 characters"); return }
 	if _, ok := cleanURL(&in.CoverURL); !ok {
 		badRequest(w, "cover_url must be a URL")
 		return
@@ -486,7 +500,9 @@ func (s *Server) deleteCollection(w http.ResponseWriter, r *http.Request) {
 		forbidden(w)
 		return
 	}
-	s.App.DB.Exec(r.Context(), `DELETE FROM collections WHERE id=$1`, id)
+	tag, err := s.App.DB.Exec(r.Context(), `DELETE FROM collections WHERE id=$1`, id)
+	if err != nil { s.serverError(w, r, err); return }
+	if tag.RowsAffected() == 0 { notFound(w); return }
 	s.App.InvalidateTenant(r.Context(), tid)
 	s.audit(r, "DELETED_COLLECTION", "collection", id, &tid, nil)
 	writeData(w, map[string]bool{"ok": true})

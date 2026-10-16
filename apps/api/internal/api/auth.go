@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"net"
 	"net/http"
 	"slices"
 	"strings"
@@ -92,6 +93,13 @@ func (s *Server) authenticate(next http.Handler) http.Handler {
 				writeError(w, http.StatusUnauthorized, "unauthorized", "Account is disabled")
 				return
 			}
+			if c.TenantID != nil && *c.TenantID != 0 {
+				var tStatus string
+				if err := s.App.DB.QueryRow(r.Context(), `SELECT status FROM tenants WHERE id=$1`, *c.TenantID).Scan(&tStatus); err == nil && tStatus == "DISABLED" {
+					writeError(w, http.StatusForbidden, "tenant_disabled", "Your organization has been disabled")
+					return
+				}
+			}
 			p = &Principal{UserID: c.UserID, Email: c.Email, Role: c.Role, TenantID: c.TenantID}
 		}
 		next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), principalKey, p)))
@@ -156,12 +164,13 @@ func (s *Server) requireRoles(roles ...string) func(http.Handler) http.Handler {
 
 func (s *Server) requireMetricsAccess(h http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		host, _, _ := strings.Cut(r.RemoteAddr, ":")
-		if strings.HasPrefix(r.RemoteAddr, "127.0.0.1") || strings.HasPrefix(r.RemoteAddr, "[::1]") || isPrivate(host) {
-			h(w, r)
+		ip := clientIP(r)
+		peer := net.ParseIP(ip)
+		if peer == nil || !(peer.IsLoopback() || peer.IsPrivate()) {
+			writeError(w, 403, "forbidden", "Metrics endpoint is not accessible from this address")
 			return
 		}
-		forbidden(w)
+		h(w, r)
 	}
 }
 

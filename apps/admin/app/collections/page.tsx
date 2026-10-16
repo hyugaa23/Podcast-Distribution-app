@@ -111,7 +111,10 @@ export default function CollectionsPage() {
             )}
             <div className="grid-2">
               <Input label="Title" required value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
-              <Input label="Slug" value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} placeholder="auto from title" />
+              <Input label="Slug" value={form.slug} onChange={(e) => {
+                const val = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '');
+                setForm({ ...form, slug: val });
+              }} pattern="[a-z0-9-]+" placeholder="auto from title" />
             </div>
             <Textarea label="Description" rows={3} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
             <div className="grid-2">

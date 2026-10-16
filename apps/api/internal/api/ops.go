@@ -238,7 +238,7 @@ func readCSVBody(r *http.Request) ([]map[string]string, error) {
 	}
 	header := records[0]
 	for i := range header {
-		header[i] = strings.ToLower(strings.TrimSpace(strings.TrimPrefix(header[i], "FEFF")))
+		header[i] = strings.ToLower(strings.TrimSpace(strings.TrimPrefix(header[i], "\xEF\xBB\xBF")))
 	}
 	var out []map[string]string
 	for _, rec := range records[1:] {

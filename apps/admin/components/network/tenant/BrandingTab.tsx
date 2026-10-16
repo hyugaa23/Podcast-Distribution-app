@@ -96,7 +96,7 @@ export function BrandingTab({ tenant, settings, theme, onSaved }: { tenant: Tena
           <Card title="Social links">
             <KeyValueRows rows={social} onChange={setSocial} keyLabel="Network" valueLabel="URL" keyPlaceholder="instagram, x, youtube…" valuePlaceholder="https://…" addLabel="+ Add social link" />
           </Card>
-          <Card title="Advanced theme configuration" actions={<span className="small muted">PRD §51</span>}>
+          <Card title="Advanced theme configuration" actions={null}>
             <div className="grid-2">
               {OVERRIDES.map((o) => o.kind === 'color' ? (
                 <ColorField key={o.key} label={o.label} value={ov[o.key]} onChange={(v) => setOv((x) => ({ ...x, [o.key]: v }))} placeholder={def[o.key]} />

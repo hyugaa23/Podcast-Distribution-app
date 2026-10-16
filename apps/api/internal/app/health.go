@@ -44,7 +44,7 @@ func (a *App) CheckRSSHealth(ctx context.Context, podcastID int64) (*RSSHealth, 
 
 	// RSS reachable: try the public URL; fall back to direct generation for local/dev hosts.
 	var feed []byte
-	client := util.SafeHTTPClient(15*time.Second, true)
+	client := util.SafeHTTPClient(15*time.Second, false)
 	resp, body, ferr := util.FetchLimited(ctx, client, feedURL, maxFeedBytes, nil)
 	switch {
 	case ferr == nil && resp.StatusCode == 200:
@@ -201,7 +201,7 @@ func uniq(in []string) []string {
 
 // urlStatus returns the HTTP status for a HEAD/GET (range) of u, or 0 on network failure.
 func (a *App) urlStatus(ctx context.Context, u string) int {
-	client := util.SafeHTTPClient(15*time.Second, true)
+	client := util.SafeHTTPClient(15*time.Second, false)
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
 	if err != nil {
 		return 0

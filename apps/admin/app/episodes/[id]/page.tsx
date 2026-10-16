@@ -115,6 +115,7 @@ export default function EpisodeEditorPage() {
     return true;
   };
   const publish = async () => {
+    if (!window.confirm('Publish this episode? It will go live immediately.')) return;
     if (dirty && !(await save(true))) return;
     const r = await run(() => post<Episode | { queued: boolean; message: string }>(`/episodes/${ep.id}/publish`));
     if (!r) return;
@@ -123,6 +124,7 @@ export default function EpisodeEditorPage() {
     reload();
   };
   const unpublish = async () => {
+    if (!window.confirm('Unpublish this episode? It will be removed from the RSS feed and website.')) return;
     const r = await run(() => post<Episode>(`/episodes/${ep.id}/unpublish`), 'Episode moved back to draft');
     if (r) reload();
   };

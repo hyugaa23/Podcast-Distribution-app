@@ -13,11 +13,20 @@ export class ApiError extends Error {
   status: number;
   code: string;
   details?: unknown;
-  constructor(status: number, body: ApiErrorBody) {
-    super(body.message);
-    this.status = status;
-    this.code = body.code;
-    this.details = body.details;
+  constructor(status: number, code: string, message: string, details?: unknown);
+  constructor(status: number, body: ApiErrorBody);
+  constructor(status: number, bodyOrCode: ApiErrorBody | string, message?: string, details?: unknown) {
+    if (typeof bodyOrCode === 'string') {
+      super(message!);
+      this.status = status;
+      this.code = bodyOrCode;
+      this.details = details;
+    } else {
+      super(bodyOrCode.message);
+      this.status = status;
+      this.code = bodyOrCode.code;
+      this.details = bodyOrCode.details;
+    }
   }
 }
 
@@ -74,7 +83,7 @@ export function qs(q?: Query): string {
 
 export async function api<T = unknown>(path: string, opts: { method?: string; body?: unknown; query?: Query; raw?: boolean } = {}): Promise<T> {
   const doFetch = () =>
-    fetch(`/api${path}${qs(opts.query)}`, {
+    fetch(`/api${path}${qs(opts.query)}`, { signal: AbortSignal.timeout(30000),
       method: opts.method ?? (opts.body !== undefined ? 'POST' : 'GET'),
       headers: {
         ...(opts.body !== undefined && !(opts.body instanceof FormData) ? { 'Content-Type': 'application/json' } : {}),
@@ -84,13 +93,18 @@ export async function api<T = unknown>(path: string, opts: { method?: string; bo
       credentials: 'same-origin',
     });
   let res = await doFetch();
-  if (res.status === 401 && path !== '/auth/login') {
+  if (res.status === 401 && !path.startsWith('/auth/login') && !path.startsWith('/auth/change-password') && !path.startsWith('/auth/refresh')) {
     if (await tryRefresh()) res = await doFetch();
     else listeners.forEach((l) => l());
   }
   if (opts.raw) return res as unknown as T;
   const text = await res.text();
-  const json = text ? JSON.parse(text) : {};
+  let json: any;
+  try {
+    json = text ? JSON.parse(text) : {};
+  } catch {
+    throw new ApiError(res.status, 'server_error', `Server returned ${res.status}`, text?.slice(0, 200));
+  }
   if (!res.ok) throw new ApiError(res.status, json.error ?? { code: 'error', message: res.statusText });
   return json as T;
 }

@@ -399,7 +399,7 @@ func (s *Server) setDistribution(w http.ResponseWriter, r *http.Request) {
 		s.serverError(w, r, err)
 		return
 	}
-	if !acc.Read {
+	if !acc.Edit {
 		forbidden(w)
 		return
 	}
@@ -455,7 +455,7 @@ func (s *Server) submitDistribution(w http.ResponseWriter, r *http.Request) {
 		s.serverError(w, r, err)
 		return
 	}
-	if !acc.Read {
+	if !acc.Edit {
 		forbidden(w)
 		return
 	}
@@ -569,7 +569,7 @@ func (s *Server) bulkDistribution(w http.ResponseWriter, r *http.Request) {
 	n := 0
 	for _, pid := range in.PodcastIDs {
 		acc, err := s.podcastAccessFor(r.Context(), p, pid)
-		if err != nil || !acc.Read {
+		if err != nil || !acc.Edit {
 			continue
 		}
 		for _, plid := range in.PlatformIDs {

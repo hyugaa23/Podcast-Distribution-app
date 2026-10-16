@@ -100,9 +100,13 @@ func (in *podcastInput) normalize() string {
 	if in.Title != nil && *in.Title == "" {
 		return "Title is required"
 	}
-	if in.ShortDescription != nil && len([]rune(*in.ShortDescription)) > 300 {
-		return "Short description must be at most 300 characters"
-	}
+	if in.Title != nil && len(*in.Title) > 500 { return "title must be under 500 characters" }
+	if in.Description != nil && len(*in.Description) > 50000 { return "description must be under 50000 characters" }
+	if in.ShortDescription != nil && len(*in.ShortDescription) > 300 { return "short_description must be under 300 characters" }
+	if in.Author != nil && len(*in.Author) > 200 { return "author must be under 200 characters" }
+	if in.Copyright != nil && len(*in.Copyright) > 200 { return "copyright must be under 200 characters" }
+	if in.OwnerName != nil && len(*in.OwnerName) > 200 { return "owner_name must be under 200 characters" }
+	if in.OwnerEmail != nil && len(*in.OwnerEmail) > 200 { return "owner_email must be under 200 characters" }
 	return ""
 }
 
@@ -471,10 +475,12 @@ func (s *Server) deletePodcast(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	tenants := s.App.TenantsShowingPodcast(r.Context(), id)
-	if _, err := s.App.DB.Exec(r.Context(), `DELETE FROM podcasts WHERE id=$1`, id); err != nil {
+	tag, err := s.App.DB.Exec(r.Context(), `DELETE FROM podcasts WHERE id=$1`, id)
+	if err != nil {
 		s.serverError(w, r, err)
 		return
 	}
+	if tag.RowsAffected() == 0 { notFound(w); return }
 	for _, t := range tenants {
 		s.App.InvalidateTenant(r.Context(), t)
 	}

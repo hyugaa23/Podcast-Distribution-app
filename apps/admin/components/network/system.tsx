@@ -1,6 +1,6 @@
 'use client';
 
-// System tabs (PRD §79, §81, §99, §103) — super admin only.
+// System tabs — super admin only.
 import { Fragment, useEffect, useState } from 'react';
 import { download, get, post, put } from '@/lib/api';
 import { Badge, Button, Card, Empty, ErrorBox, Spinner, Stat, fmtBytes, fmtDate, useAction, useAsync } from '@/components/ui';
@@ -294,7 +294,7 @@ export function MetricsTab() {
             </table>
           </div>
         )}
-        <p className="hint" style={{ marginTop: 8 }}>PRD §81 targets: API responses under 200 ms and pages under 500 ms for the vast majority of requests. Prometheus metrics are also exposed at <code>/metrics</code> on the private network.</p>
+        <p className="hint" style={{ marginTop: 8 }}>Performance targets: API responses under 200 ms and pages under 500 ms for the vast majority of requests. Prometheus metrics are also exposed at <code>/metrics</code> on the private network.</p>
       </Card>
     </div>
   );
@@ -306,7 +306,7 @@ export function BackupTab() {
   return (
     <div className="grid-2">
       <Card title="Configuration & metadata export">
-        <p className="small" style={{ marginTop: 0 }}>Downloads a JSON snapshot of tenant configuration (settings, branding, SEO, domains), podcast metadata and distribution metadata (PRD §103). Audio and images are not included.</p>
+        <p className="small" style={{ marginTop: 0 }}>Downloads a JSON snapshot of tenant configuration (settings, branding, SEO, domains), podcast metadata and distribution metadata. Audio and images are not included.</p>
         <Button variant="primary" loading={busy} onClick={() => run(() => download('/system/backup', `podcast-backup-${new Date().toISOString().slice(0, 10)}.json`), 'Backup downloaded')}>⬇ Download backup.json</Button>
         <p className="hint" style={{ marginTop: 8 }}>The export is recorded in the audit log.</p>
       </Card>

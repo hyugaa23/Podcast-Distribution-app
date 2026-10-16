@@ -5,7 +5,6 @@ export async function POST(req: Request) {
   const host = (req.headers.get('x-forwarded-host') || req.headers.get('host') || '').split(',')[0]!.replace(/:\d+$/, '');
   const body = await req.text();
   if (body.length > 16_000) return new Response(null, { status: 413 });
-  const fwd = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || '';
   const res = await fetch(`${API}/api/public/events`, {
     method: 'POST',
     body,
@@ -13,8 +12,6 @@ export async function POST(req: Request) {
       'content-type': 'application/json',
       'x-tenant-host': host,
       'user-agent': req.headers.get('user-agent') || '',
-      ...(fwd ? { 'x-forwarded-for': fwd } : {}),
-      'x-country': req.headers.get('cf-ipcountry') || req.headers.get('x-vercel-ip-country') || req.headers.get('x-country') || '',
     },
     cache: 'no-store',
   }).catch(() => null);

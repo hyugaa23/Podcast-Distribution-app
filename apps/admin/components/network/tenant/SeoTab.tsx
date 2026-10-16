@@ -6,7 +6,7 @@ import type { SEOSettings, Tenant, TenantSettings } from '@/lib/types';
 import { Button, Card, ErrorBox, ImageUpload, Input, Select, Spinner, Textarea, useAction, useAsync } from '@/components/ui';
 import { siteUrl } from '../common';
 
-/** SEO settings (PRD §33–38). */
+/** SEO settings. */
 export function SeoTab({ tenant }: { tenant: Tenant }) {
   const { data, error, loading, reload } = useAsync(() => get<SEOSettings>(`/tenants/${tenant.id}/seo`), [tenant.id]);
   if (loading && !data) return <Spinner />;
@@ -45,7 +45,7 @@ function SeoForm({ tenant, initial, onSaved }: { tenant: Tenant; initial: SEOSet
         <Textarea label="Meta description" rows={3} value={s.meta_description} onChange={(e) => set('meta_description', e.target.value)}
           hint={<span style={{ color: descLen > 160 ? 'var(--amber)' : undefined }}>{descLen}/160 characters recommended</span>} />
         <div className="alert alert--info small">
-          <strong>Dynamic page titles (PRD §34)</strong> — generated automatically:
+          <strong>Dynamic page titles</strong> — generated automatically:
           <ul style={{ margin: '4px 0 0', paddingLeft: 18 }}>
             <li>Podcast: <code>{'{podcast_title} | {site_name}'}</code></li>
             <li>Episode: <code>{'{episode_title} – {podcast_title}'}</code></li>

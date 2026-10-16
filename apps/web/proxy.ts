@@ -24,6 +24,7 @@ async function resolve(host: string, path: string): Promise<Resolved | null> {
   if (hit && Date.now() - hit.at < TTL) return hit.value;
   const res = await fetch(`${API}/api/public/resolve?host=${encodeURIComponent(host)}&path=${encodeURIComponent(path)}`, {
     headers: { accept: 'application/json' },
+    signal: AbortSignal.timeout(5000),
   });
   let value: Resolved | null = null;
   if (res.ok) value = ((await res.json()) as { data: Resolved }).data;
@@ -44,7 +45,7 @@ function publicUrl(req: NextRequest): URL {
   const proto = req.headers.get('x-forwarded-proto')?.split(',')[0]!.trim();
   if (proto === 'http' || proto === 'https') url.protocol = proto + ':';
   const raw = (req.headers.get('x-forwarded-host') || req.headers.get('host') || '').split(',')[0]!.trim();
-  const port = /:(d+)$/.exec(raw)?.[1] ?? '';
+  const port = /:(\d+)$/.exec(raw)?.[1] ?? '';
   url.port = port;
   return url;
 }

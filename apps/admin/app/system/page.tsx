@@ -12,7 +12,7 @@ const TABS: { key: TabKey; label: string }[] = [
   { key: 'metrics', label: 'Metrics' }, { key: 'backup', label: 'Backup' },
 ];
 
-/** System (super admin): settings, jobs, logs, metrics, backup (PRD §79, §99, §103). */
+/** System (super admin): settings, jobs, logs, metrics, backup. */
 export default function SystemPage() {
   const { can } = useAuth();
   const [tab, setTab] = useState<TabKey>('settings');

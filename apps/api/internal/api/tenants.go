@@ -69,6 +69,9 @@ func validateTenantInput(in *app.CreateTenantInput) string {
 	if in.Name == "" {
 		return "Site name is required"
 	}
+	if len(in.Name) > 200 {
+		return "name must be under 200 characters"
+	}
 	if in.ContentMode != "" && in.ContentMode != app.ModeIndependent && in.ContentMode != app.ModeShared && in.ContentMode != app.ModeSyndicated {
 		return "content_mode must be INDEPENDENT, SHARED or SYNDICATED"
 	}
@@ -186,6 +189,10 @@ func (s *Server) updateTenant(w http.ResponseWriter, r *http.Request) {
 		n := util.PlainText(*in.Name)
 		if n == "" {
 			badRequest(w, "Name is required")
+			return
+		}
+		if len(n) > 200 {
+			badRequest(w, "name must be under 200 characters")
 			return
 		}
 		in.Name = &n
@@ -350,8 +357,9 @@ func (s *Server) updateTenantSettings(w http.ResponseWriter, r *http.Request) {
 				badRequest(w, "Navigation items need a label and link")
 				return
 			}
-			if strings.HasPrefix(strings.ToLower(strings.TrimSpace(n.Href)), "javascript:") {
-				badRequest(w, "Invalid navigation link")
+			href := strings.TrimSpace(n.Href)
+			if href != "" && !strings.HasPrefix(href, "/") && !strings.HasPrefix(href, "https://") && !strings.HasPrefix(href, "http://") && !strings.HasPrefix(href, "mailto:") {
+				badRequest(w, "navigation links must start with /, http://, https:// or mailto:")
 				return
 			}
 			(*in.Navigation)[i].Label = util.PlainText(n.Label)
@@ -895,7 +903,9 @@ func (s *Server) deleteUser(w http.ResponseWriter, r *http.Request) {
 		forbidden(w)
 		return
 	}
-	s.App.DB.Exec(r.Context(), `DELETE FROM users WHERE id=$1`, id)
+	tag, err2 := s.App.DB.Exec(r.Context(), `DELETE FROM users WHERE id=$1`, id)
+	if err2 != nil { s.serverError(w, r, err2); return }
+	if tag.RowsAffected() == 0 { notFound(w); return }
 	s.audit(r, "DELETED_USER", "user", id, tid, nil)
 	writeData(w, map[string]bool{"ok": true})
 }

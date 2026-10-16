@@ -291,7 +291,7 @@ func (s *Server) publicResolve(w http.ResponseWriter, r *http.Request) {
 func (s *Server) publicDomainVerification(w http.ResponseWriter, r *http.Request) {
 	host := util.NormalizeHost(firstNonEmpty(r.URL.Query().Get("host"), r.URL.Query().Get("domain")))
 	var tok string
-	if err := s.App.DB.QueryRow(r.Context(), `SELECT verification_token FROM domains WHERE domain=$1`, host).Scan(&tok); err != nil {
+	if err := s.App.DB.QueryRow(r.Context(), `SELECT verification_token FROM domains WHERE domain=$1 AND verification_status='VERIFIED' AND status='ACTIVE'`, host).Scan(&tok); err != nil {
 		notFound(w)
 		return
 	}

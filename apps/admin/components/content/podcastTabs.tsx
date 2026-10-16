@@ -42,6 +42,7 @@ export function DetailsTab({ p, onSaved, onDeleted, onDirtyChange }: { p: Podcas
     if (r) { setDirty(false); onSaved(r); setD(podcastToDraft(r, tz)); }
   };
   const lifecycle = async (action: 'publish' | 'unpublish') => {
+    if (action === 'unpublish' && !window.confirm('Unpublish this podcast? It will be removed from all sites and feeds.')) return;
     const r = await run(() => post<Podcast>(`/podcasts/${p.id}/${action}`), action === 'publish' ? 'Podcast published' : 'Podcast unpublished');
     if (r) { onSaved(r); setD((x) => ({ ...x, status: r.status, scheduled_at: '' })); }
   };
