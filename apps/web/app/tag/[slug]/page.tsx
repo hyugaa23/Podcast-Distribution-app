@@ -26,7 +26,8 @@ export default async function TagPage({ params }: Props) {
         </>
       )}
       <h2 className="pe-section-title">Episodes</h2>
-      <EpisodeList site={site} episodes={d.episodes} />
+      <EpisodeList site={site} episodes={d.episodes.slice(0, 50)} />
+      {d.episodes.length > 50 && <p className="pe-page__lead" style={{ marginTop: 12 }}>Showing 50 of {d.episodes.length} episodes.</p>}
     </PageShell>
   );
 }

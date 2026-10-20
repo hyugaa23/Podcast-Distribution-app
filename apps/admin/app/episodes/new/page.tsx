@@ -15,7 +15,7 @@ function NewEpisode() {
   const canEdit = useCanEdit();
   const { scopeTenantId } = useAuth();
   const tq = useTenantQuery();
-  const pods = useAsync(() => list<Podcast>('/podcasts', { ...tq, sort: 'title', per_page: 200 }), [scopeTenantId]);
+  const pods = useAsync(() => list<Podcast>('/podcasts', { ...tq, sort: 'title', per_page: 100 }), [scopeTenantId]);
   const editable = (pods.data?.data ?? []).filter((p) => p.can_edit);
   const [podcastId, setPodcastId] = useState(sp.get('podcast') ?? '');
   const [title, setTitle] = useState('');
@@ -67,7 +67,7 @@ function NewEpisode() {
             <div className="grid-3">
               <Input label="Episode number" type="number" min={1} step={1} value={episodeNumber} onChange={(e) => setEpisodeNumber(e.target.value)}
                 hint={suggested ? `Next would be ${suggested}` : undefined} />
-              <Input label="Season number" type="number" min={0} value={seasonNumber} onChange={(e) => setSeasonNumber(e.target.value)} />
+              <Input label="Season number" type="number" min={1} value={seasonNumber} onChange={(e) => setSeasonNumber(e.target.value)} />
               <Select label="Episode type" value={type} onChange={(e) => setType(e.target.value as Episode['episode_type'])}
                 options={[{ value: 'full', label: 'Full' }, { value: 'trailer', label: 'Trailer' }, { value: 'bonus', label: 'Bonus' }]} />
             </div>

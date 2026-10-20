@@ -97,6 +97,8 @@ func (s *Server) Router() http.Handler {
 			r.Post("/logout", s.logout)
 			r.With(s.authenticate).Get("/me", s.me)
 			r.With(s.authenticate).Post("/change-password", s.changePassword)
+			r.With(s.rateLimit("forgot", 5)).Post("/forgot-password", s.forgotPassword)
+			r.With(s.rateLimit("reset", 10)).Post("/reset-password", s.resetPassword)
 		})
 
 		// ---------------- Admin (authenticated) ----------------

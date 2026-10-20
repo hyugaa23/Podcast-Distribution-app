@@ -42,7 +42,11 @@ function toBody(d: Draft, orig: Episode, tz: string, includeTranscript: boolean)
   if (d.slug.trim() && d.slug.trim() !== orig.slug) body.slug = d.slug.trim();
   if (en === null) body.clear_episode_number = true; else body.episode_number = en;
   if (sn === null) body.clear_season_number = true; else body.season_number = sn;
-  if (d.publish_date && d.publish_date !== isoToZonedInput(orig.published_at, tz)) body.publish_date = d.publish_date;
+  if (d.publish_date) {
+    if (d.publish_date !== isoToZonedInput(orig.published_at, tz)) body.publish_date = d.publish_date;
+  } else if (orig.published_at) {
+    body.clear_publish_date = true;
+  }
   return body;
 }
 
@@ -202,7 +206,7 @@ export default function EpisodeEditorPage() {
                 <Textarea label="Show notes" rows={6} value={d.show_notes} onChange={(e) => set('show_notes', e.target.value)} hint="Links, timestamps and resources (HTML allowed)." />
                 <div className="grid-3">
                   <Input label="Episode number" type="number" min={1} step={1} value={d.episode_number} onChange={(e) => set('episode_number', e.target.value)} />
-                  <Input label="Season number" type="number" min={0} value={d.season_number} onChange={(e) => set('season_number', e.target.value)} />
+                  <Input label="Season number" type="number" min={1} value={d.season_number} onChange={(e) => set('season_number', e.target.value)} />
                   <Select label="Episode type" value={d.episode_type} onChange={(e) => set('episode_type', e.target.value as Episode['episode_type'])}
                     options={[{ value: 'full', label: 'Full' }, { value: 'trailer', label: 'Trailer' }, { value: 'bonus', label: 'Bonus' }]} />
                 </div>

@@ -21,6 +21,7 @@ export default async function CollectionsPage() {
           <h2 id={`col-${c.id}`} className="pe-section-title"><a href={`/collection/${c.slug}`}>{c.title}</a></h2>
           {c.description && <p className="pe-page__lead">{c.description}</p>}
           <PodcastGrid site={site} podcasts={c.podcasts.slice(0, 6)} />
+          {c.podcasts.length > 6 && <p style={{ marginTop: 8 }}><a href={`/collection/${c.slug}`}>View all {c.podcasts.length} podcasts →</a></p>}
         </section>
       ))}
     </PageShell>

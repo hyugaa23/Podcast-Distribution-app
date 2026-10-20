@@ -75,6 +75,7 @@ export default function ApiKeysPage() {
       <PageHeader title="API keys" subtitle="Credentials for external integrations" actions={<Button variant="primary" disabled={!data} onClick={() => setOpen(true)}>+ New API key</Button>} />
       <Card className="nw-callout">
         <span className="small">Authenticate with the header <code className="mono">X-API-Key: pk_…</code> (or <code className="mono">Authorization: Bearer pk_…</code>). Keys are scoped to one website and only to the permissions you grant. The full key is shown once — store it in a secret manager.</span>
+        <span className="small muted" style={{ display: 'block', marginTop: 6 }}>Rate limit: 600 requests per minute per key. Public endpoints: 240/min. Exceeding returns HTTP 429.</span>
       </Card>
       {loading && !data ? <Spinner /> : error ? <ErrorBox error={error} onRetry={reload} /> : (
         <>

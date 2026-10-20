@@ -4,7 +4,7 @@ import type { Role } from './api';
 export interface Tenant {
   id: number; name: string; slug: string; theme_id: number; theme_key: string; theme_name: string;
   content_mode: 'INDEPENDENT' | 'SHARED' | 'SYNDICATED'; language: string; timezone: string; status: 'ACTIVE' | 'DISABLED';
-  primary_domain: string; created_at: string; updated_at: string;
+  is_demo: boolean; primary_domain: string; created_at: string; updated_at: string;
 }
 
 export interface Theme { id: number; key: string; number: number; name: string; description: string; default_config: Record<string, string>; is_active: boolean }

@@ -2,6 +2,9 @@ package api
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
+	"fmt"
 	"net"
 	"net/http"
 	"slices"
@@ -393,6 +396,67 @@ func (s *Server) changePassword(w http.ResponseWriter, r *http.Request) {
 	s.App.DB.Exec(r.Context(), `UPDATE users SET password_hash=$2, updated_at=now() WHERE id=$1`, p.UserID, nh)
 	s.App.DB.Exec(r.Context(), `UPDATE refresh_tokens SET revoked_at=now() - interval '1 minute' WHERE user_id=$1 AND revoked_at IS NULL`, p.UserID)
 	s.audit(r, "CHANGED_PASSWORD", "user", p.UserID, p.TenantID, nil)
+	writeData(w, map[string]bool{"ok": true})
+}
+
+func hashToken(token string) string {
+	h := sha256.Sum256([]byte(token))
+	return hex.EncodeToString(h[:])
+}
+
+func (s *Server) forgotPassword(w http.ResponseWriter, r *http.Request) {
+	var in struct {
+		Email string `json:"email"`
+	}
+	if err := decode(r, &in); err != nil {
+		badRequest(w, err.Error())
+		return
+	}
+	email := strings.ToLower(strings.TrimSpace(in.Email))
+	writeData(w, map[string]string{"message": "If that email exists, a reset link has been generated."})
+
+	var userID int64
+	if err := s.App.DB.QueryRow(r.Context(), `SELECT id FROM users WHERE email=$1 AND status='ACTIVE'`, email).Scan(&userID); err != nil {
+		return
+	}
+	s.App.DB.Exec(r.Context(), `UPDATE password_reset_tokens SET used_at=now() WHERE user_id=$1 AND used_at IS NULL`, userID)
+	token := util.RandomHex(32)
+	s.App.DB.Exec(r.Context(), `INSERT INTO password_reset_tokens(user_id, token_hash, expires_at) VALUES ($1,$2,$3)`,
+		userID, hashToken(token), time.Now().Add(1*time.Hour))
+	resetURL := fmt.Sprintf("/reset-password?token=%s", token)
+	s.App.SysLog(r.Context(), "info", "auth", fmt.Sprintf("Password reset requested for %s", email), resetURL, nil)
+	s.App.Log.Info("password reset token generated", "email", email, "url", resetURL)
+}
+
+func (s *Server) resetPassword(w http.ResponseWriter, r *http.Request) {
+	var in struct {
+		Token    string `json:"token"`
+		Password string `json:"new_password"`
+	}
+	if err := decode(r, &in); err != nil {
+		badRequest(w, err.Error())
+		return
+	}
+	if len(in.Password) < 8 {
+		badRequest(w, "Password must be at least 8 characters")
+		return
+	}
+	th := hashToken(in.Token)
+	var tokenID, userID int64
+	err := s.App.DB.QueryRow(r.Context(), `SELECT id, user_id FROM password_reset_tokens WHERE token_hash=$1 AND used_at IS NULL AND expires_at > now()`, th).Scan(&tokenID, &userID)
+	if err != nil {
+		writeError(w, http.StatusUnprocessableEntity, "invalid_token", "Reset link is invalid or has expired")
+		return
+	}
+	nh, err := authn.HashPassword(in.Password)
+	if err != nil {
+		badRequest(w, err.Error())
+		return
+	}
+	s.App.DB.Exec(r.Context(), `UPDATE users SET password_hash=$2, updated_at=now() WHERE id=$1`, userID, nh)
+	s.App.DB.Exec(r.Context(), `UPDATE password_reset_tokens SET used_at=now() WHERE id=$1`, tokenID)
+	s.App.DB.Exec(r.Context(), `UPDATE refresh_tokens SET revoked_at=now() - interval '1 minute' WHERE user_id=$1 AND revoked_at IS NULL`, userID)
+	s.App.Audit(r.Context(), app.AuditEntry{UserID: &userID, Action: "RESET_PASSWORD", ResourceType: "user", ResourceID: userID, IP: clientIP(r), UserAgent: r.UserAgent()})
 	writeData(w, map[string]bool{"ok": true})
 }
 

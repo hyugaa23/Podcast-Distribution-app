@@ -123,7 +123,7 @@ func (a *App) Notify(ctx context.Context, tenantID *int64, typ, severity, title,
 // EmitWebhook queues delivery of event to every active webhook subscribed by the tenant (or global hooks).
 func (a *App) EmitWebhook(ctx context.Context, tenantID *int64, event string, data any) {
 	rows, err := a.DB.Query(ctx, `SELECT id FROM webhooks WHERE is_active AND $1 = ANY(events)
-		AND (tenant_id IS NULL OR tenant_id = $2)`, event, tenantID)
+		AND (tenant_id IS NULL OR ($2::bigint IS NOT NULL AND tenant_id = $2))`, event, tenantID)
 	if err != nil {
 		return
 	}

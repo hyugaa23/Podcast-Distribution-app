@@ -7,7 +7,7 @@ import { Badge, Button, Card, Field, Input, Progress, Select, Textarea, cx, errM
 
 const AUDIO_EXT = ['mp3', 'm4a', 'wav'];
 const AUDIO_ACCEPT = '.mp3,.m4a,.wav,audio/mpeg,audio/mp4,audio/x-m4a,audio/wav,audio/x-wav';
-const MAX_AUDIO = 1024 * 1024 * 1024; // 1 GB
+const MAX_AUDIO = 500 * 1024 * 1024; // 500 MB (matches backend default)
 
 // ---------------------------------------------------------------- Audio
 export function AudioCard({ ep, audio, readOnly, onChanged }: { ep: Episode; audio: AudioFile | null; readOnly: boolean; onChanged: () => void }) {
@@ -27,7 +27,7 @@ export function AudioCard({ ep, audio, readOnly, onChanged }: { ep: Episode; aud
   const upload = async (f: File) => {
     const extn = f.name.split('.').pop()?.toLowerCase() ?? '';
     if (!AUDIO_EXT.includes(extn)) { toast('error', 'Unsupported file. Please upload an MP3, M4A or WAV file.'); return; }
-    if (f.size > MAX_AUDIO) { toast('error', 'File is too large (max 1 GB).'); return; }
+    if (f.size > MAX_AUDIO) { toast('error', 'File is too large (max 500 MB).'); return; }
     setFileName(f.name);
     setProgress(0);
     try {
@@ -189,6 +189,7 @@ export function TranscriptCard({ ep, transcript, format, onTranscript, onFormat,
                   const f = e.target.files?.[0];
                   e.target.value = '';
                   if (!f) return;
+                  if (f.size > 5 * 1024 * 1024) { toast('error', 'Transcript file is too large (max 5 MB).'); return; }
                   setUpBusy(true);
                   try { await uploadFile('transcript', ep.id, f); toast('success', 'Transcript uploaded'); onReload(); } catch (err) { toast('error', errMsg(err)); } finally { setUpBusy(false); }
                 }} />

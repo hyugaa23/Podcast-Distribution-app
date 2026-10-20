@@ -22,14 +22,14 @@ export function DomainInstructions({ d, cnameTarget, platformIps }: { d: Domain;
         <h3 className="nw-h3">1. Point DNS to the platform</h3>
         <div className="table-wrap">
           <table className="table">
-            <thead><tr><th>Type</th><th>Name</th><th>Value</th></tr></thead>
+            <thead><tr><th>Type</th><th>Name</th><th>Value</th><th /></tr></thead>
             <tbody>
               {apex ? (
                 (platformIps?.length ? platformIps : ['<platform IP address>']).map((ip) => (
-                  <tr key={ip}><td>A</td><td className="mono">{d.domain} (@)</td><td className="mono">{ip}</td></tr>
+                  <tr key={ip}><td>A</td><td className="mono">{d.domain} (@)</td><td className="mono">{ip}</td><td>{!ip.startsWith('<') && <CopyButton text={ip} />}</td></tr>
                 ))
               ) : (
-                <tr><td>CNAME</td><td className="mono">{d.domain}</td><td className="mono">{cnameTarget || '<platform hostname>'}</td></tr>
+                <tr><td>CNAME</td><td className="mono">{d.domain}</td><td className="mono">{cnameTarget || '<platform hostname>'}</td><td>{cnameTarget && <CopyButton text={cnameTarget} />}</td></tr>
               )}
             </tbody>
           </table>

@@ -323,6 +323,21 @@ export function ImageUpload({ label, value, onUpload, hint, accept = 'image/jpeg
           <input id={id} type="file" accept={accept} disabled={busy} onChange={async (e) => {
             const f = e.target.files?.[0];
             if (!f) return;
+            if (label.toLowerCase().includes('artwork')) {
+              const ok = await new Promise<boolean>((res) => {
+                const img = new Image();
+                img.onload = () => {
+                  if (img.width !== img.height || img.width < 1400 || img.width > 3000) {
+                    toast('error', `Artwork must be square, 1400–3000 px. This image is ${img.width}×${img.height}.`);
+                    res(false);
+                  } else res(true);
+                  URL.revokeObjectURL(img.src);
+                };
+                img.onerror = () => { URL.revokeObjectURL(img.src); res(true); };
+                img.src = URL.createObjectURL(f);
+              });
+              if (!ok) { e.target.value = ''; return; }
+            }
             setBusy(true);
             try { await onUpload(f); toast('success', 'Image uploaded'); } catch (err) { toast('error', errMsg(err)); } finally { setBusy(false); e.target.value = ''; }
           }} />

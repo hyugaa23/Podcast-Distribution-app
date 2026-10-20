@@ -35,7 +35,7 @@ func (s *Server) previewRSSImport(w http.ResponseWriter, r *http.Request) {
 		badRequest(w, err.Error())
 		return
 	}
-	ctx, cancel := context.WithTimeout(r.Context(), 45*time.Second)
+	ctx, cancel := context.WithTimeout(r.Context(), 25*time.Second)
 	defer cancel()
 	pf, err := s.App.PreviewFeed(ctx, in.FeedURL)
 	if err != nil {
@@ -342,7 +342,13 @@ func (s *Server) importCSV(w http.ResponseWriter, r *http.Request) {
 	case "episodes":
 		for i, row := range rows {
 			var podcastID int64
-			if err := s.App.DB.QueryRow(ctx, `SELECT id FROM podcasts WHERE slug=$1`, row["podcast_slug"]).Scan(&podcastID); err != nil {
+			q := `SELECT id FROM podcasts WHERE slug=$1`
+			args := []any{row["podcast_slug"]}
+			if owner != nil {
+				q = `SELECT p.id FROM podcasts p JOIN tenant_podcasts tp ON tp.podcast_id=p.id WHERE p.slug=$1 AND tp.tenant_id=$2`
+				args = append(args, *owner)
+			}
+			if err := s.App.DB.QueryRow(ctx, q, args...).Scan(&podcastID); err != nil {
 				errs = append(errs, fmt.Sprintf("row %d: unknown podcast_slug %q", i+2, row["podcast_slug"]))
 				continue
 			}
@@ -505,6 +511,24 @@ func (s *Server) export(w http.ResponseWriter, r *http.Request) {
 		query = `SELECT ad.day::text, t.name, COALESCE(p.title,''), COALESCE(e.title,''), ad.event_type, ad.events::text, ad.visitors::text
 			FROM analytics_daily ad JOIN tenants t ON t.id=ad.tenant_id LEFT JOIN podcasts p ON p.id=ad.podcast_id
 			LEFT JOIN episodes e ON e.id=ad.episode_id WHERE ` + tscope + ` AND ad.day >= current_date - 365 ORDER BY ad.day DESC, t.name`
+	case "audit":
+		if p.Role == roleCreator {
+			forbidden(w)
+			return
+		}
+		header = []string{"timestamp", "user", "action", "resource_type", "resource_id", "tenant", "ip"}
+		tscope := "TRUE"
+		if tid != 0 {
+			tscope = "a.tenant_id=$1"
+		}
+		auditArgs := args[:min(len(args), 1)]
+		if tid == 0 {
+			auditArgs = nil
+		}
+		query = `SELECT a.created_at::text, COALESCE(u.name,'system'), a.action, a.resource_type, COALESCE(a.resource_id::text,''),
+			COALESCE(t.name,'Network'), a.ip FROM audit_logs a LEFT JOIN users u ON u.id=a.user_id
+			LEFT JOIN tenants t ON t.id=a.tenant_id WHERE ` + tscope + ` ORDER BY a.created_at DESC LIMIT 10000`
+		args = auditArgs
 	default:
 		notFound(w)
 		return
@@ -1023,8 +1047,12 @@ func (s *Server) createWebhook(w http.ResponseWriter, r *http.Request) {
 		in.TenantID = p.TenantID
 	}
 	u, err := util.ValidateFetchURL(in.URL)
-	if err != nil || (u.Scheme != "https" && !s.App.Cfg.AllowPrivateFetch) {
-		badRequest(w, "Webhook URL must be an https URL")
+	if err != nil || (u.Scheme != "https" && u.Scheme != "http") {
+		badRequest(w, "Webhook URL must be a valid HTTP(S) URL")
+		return
+	}
+	if u.Scheme != "https" && !s.App.Cfg.AllowPrivateFetch {
+		badRequest(w, "Webhook URL must use HTTPS in production (set ALLOW_PRIVATE_FETCH=true for development)")
 		return
 	}
 	if len(in.Events) == 0 {
@@ -1459,6 +1487,15 @@ func (s *Server) masterDashboard(w http.ResponseWriter, r *http.Request) {
 	}
 	if warnGB > 0 && float64(stats["storage_bytes"]) > warnGB*(1<<30) {
 		alerts = append(alerts, alert{Severity: "warning", Source: "storage", Message: fmt.Sprintf("Storage above %.0f GB warning threshold", warnGB), Link: "/system", At: time.Now()})
+	}
+	var lastBackup *time.Time
+	s.App.DB.QueryRow(ctx, `SELECT max(created_at) FROM audit_logs WHERE action='EXPORTED_BACKUP'`).Scan(&lastBackup)
+	if lastBackup == nil || time.Since(*lastBackup) > 7*24*time.Hour {
+		msg := "No backup recorded in the last 7 days"
+		if lastBackup != nil {
+			msg = fmt.Sprintf("Last backup was %d days ago", int(time.Since(*lastBackup).Hours()/24))
+		}
+		alerts = append(alerts, alert{Severity: "warning", Source: "backup", Message: msg, Link: "/system#backup", At: time.Now()})
 	}
 	qs, _ := s.App.Queue.Stats(ctx)
 	from, to := time.Now().AddDate(0, 0, -30), time.Now().Add(time.Hour)

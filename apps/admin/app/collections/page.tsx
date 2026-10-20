@@ -21,7 +21,7 @@ export default function CollectionsPage() {
   // Podcasts available on the collection's site (for the picker).
   const formTenant = form?.tenant_id || 0;
   const pods = useAsync(
-    () => (form ? list<Podcast>('/podcasts', { tenant_id: isSuper ? formTenant || undefined : undefined, sort: 'title', per_page: 200 }) : Promise.resolve(undefined)),
+    () => (form ? list<Podcast>('/podcasts', { tenant_id: isSuper ? formTenant || undefined : undefined, sort: 'title', per_page: 100 }) : Promise.resolve(undefined)),
     [!!form, formTenant],
   );
   const podMap = new Map((pods.data?.data ?? []).map((p) => [p.id, p]));

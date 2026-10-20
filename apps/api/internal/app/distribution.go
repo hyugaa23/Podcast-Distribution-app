@@ -76,6 +76,7 @@ func (a *App) DistributionReadiness(ctx context.Context, podcastID int64) (*Read
 	if a.DB.QueryRow(ctx, `SELECT width, height FROM images WHERE owner_type='podcast' AND owner_id=$1 AND status='READY'
 		ORDER BY id DESC LIMIT 1`, podcastID).Scan(&w, &h) == nil && w > 0 {
 		if w != h || w < 1400 || w > 3000 {
+			items[2].Passed = false
 			items[2].Detail = fmt.Sprintf("Artwork is %dx%d; directories require a square image between 1400 and 3000 px", w, h)
 		}
 	}
@@ -344,6 +345,43 @@ func toFloat(v any) float64 {
 	}
 	f, _ := strconv.ParseFloat(fmt.Sprint(v), 64)
 	return f
+}
+
+// SubmitDistribution performs an async distribution submission (worker job).
+func (a *App) SubmitDistribution(ctx context.Context, podcastID, platformID int64) error {
+	rows, err := a.DB.Query(ctx, PlatformSelect+` WHERE id=$1`, platformID)
+	if err != nil {
+		return err
+	}
+	pl, err := pgx.CollectOneRow(rows, pgx.RowToStructByName[Platform])
+	if err != nil {
+		return fmt.Errorf("platform %d not found: %w", platformID, err)
+	}
+	rd, err := a.DistributionReadiness(ctx, podcastID)
+	if err != nil {
+		return err
+	}
+	if !rd.Ready {
+		st, reason := "FAILED", fmt.Sprintf("Distribution readiness is %d%%", rd.Percent)
+		a.UpsertDistribution(ctx, podcastID, platformID, SetDistributionInput{Status: &st, IssueReason: &reason}, nil, "worker")
+		return fmt.Errorf("podcast %d not ready for distribution", podcastID)
+	}
+	if pl.SubmissionType != "API" {
+		st := "SUBMITTED"
+		_, err := a.UpsertDistribution(ctx, podcastID, platformID, SetDistributionInput{Status: &st, Note: "Marked submitted by worker"}, nil, "worker")
+		return err
+	}
+	res, err := a.SubmitViaAPI(ctx, &pl, rd.FeedURL)
+	if err != nil {
+		st, reason := "FAILED", err.Error()
+		a.UpsertDistribution(ctx, podcastID, platformID, SetDistributionInput{Status: &st, IssueReason: &reason}, nil, "worker")
+		return err
+	}
+	_, err = a.UpsertDistribution(ctx, podcastID, platformID, SetDistributionInput{
+		Status: &res.Status, ExternalID: &res.ExternalID, ExternalURL: &res.ExternalURL,
+		Note: "Submitted via API (worker): " + res.Message,
+	}, nil, "worker")
+	return err
 }
 
 // RefreshDistribution polls API providers and checks LIVE external URLs (worker; PRD §95).

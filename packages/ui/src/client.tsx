@@ -80,7 +80,18 @@ export function SubscribeButton({ feedUrl, className, children }: { feedUrl: str
           <div className="pe-subscribe__row">
             <input readOnly value={feedUrl} aria-label="RSS feed URL" onFocus={(e) => e.currentTarget.select()} />
             <button type="button" onClick={async () => {
-              try { await navigator.clipboard.writeText(feedUrl); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch { /* ignore */ }
+              try {
+                await navigator.clipboard.writeText(feedUrl);
+                setCopied(true); setTimeout(() => setCopied(false), 2000);
+              } catch {
+                const ta = document.createElement('textarea');
+                ta.value = feedUrl;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                ta.remove();
+                setCopied(true); setTimeout(() => setCopied(false), 2000);
+              }
             }}>{copied ? 'Copied' : 'Copy'}</button>
           </div>
         </div>

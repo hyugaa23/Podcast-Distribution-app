@@ -1,7 +1,7 @@
 // Server-safe shared components used by every theme.
 import type { CSSProperties, ReactNode } from 'react';
 import type { Citation, FAQItem, ListenOn, ListMeta } from '@podcast/types';
-import { initials } from './format';
+import { initials, tagHref } from './format';
 import { variantSrcSet } from './variants';
 
 /** Square artwork with alt text and a graceful fallback (PRD §82 image alt text). */
@@ -181,7 +181,7 @@ export function TagList({ tags, className }: { tags: string[]; className?: strin
   return (
     <ul className={`pe-tags ${className ?? ''}`} aria-label="Tags">
       {tags.map((t) => (
-        <li key={t}><a href={`/tag/${encodeURIComponent(t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''))}`}>#{t}</a></li>
+        <li key={t}><a href={tagHref(t)}>#{t}</a></li>
       ))}
     </ul>
   );

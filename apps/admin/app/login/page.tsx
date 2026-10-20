@@ -49,7 +49,7 @@ function LoginForm() {
             </div>
             <div className="login-split__feat">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18" /><path d="m7 15 4-4 3 3 5-6" /></svg>
-              <span>Real-time analytics</span>
+              <span>Listener analytics</span>
             </div>
             <div className="login-split__feat">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3a14 14 0 0 1 0 18" /><path d="M12 3a14 14 0 0 0 0 18" /><circle cx="12" cy="12" r="9" /><path d="M3 12h18" /></svg>
@@ -93,6 +93,8 @@ function LoginForm() {
           {error && <p className="alert alert--error" role="alert">{error}</p>}
 
           <Button type="submit" variant="primary" loading={busy} className="w100">Sign in</Button>
+
+          <p style={{ textAlign: 'center', marginTop: 12 }}><a href="/forgot-password" className="link small">Forgot password?</a></p>
 
           <p className="login-split__footer">Podcast Engine &copy; {new Date().getFullYear()}</p>
         </form>

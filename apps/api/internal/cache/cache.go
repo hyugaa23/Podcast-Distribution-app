@@ -11,11 +11,13 @@ import (
 	"time"
 
 	"github.com/redis/go-redis/v9"
+	"golang.org/x/sync/singleflight"
 )
 
 type Cache struct {
 	rdb *redis.Client
 	mem *memStore
+	sf  singleflight.Group
 }
 
 func New(rdb *redis.Client) *Cache {
@@ -97,17 +99,28 @@ func (c *Cache) DelPrefix(ctx context.Context, prefix string) {
 }
 
 // Remember returns the cached value for key or computes, stores and returns it.
+// Concurrent callers for the same key share a single computation (singleflight).
 func Remember[T any](ctx context.Context, c *Cache, key string, ttl time.Duration, fn func() (T, error)) (T, error) {
 	var v T
 	if c.GetJSON(ctx, key, &v) {
 		return v, nil
 	}
-	v, err := fn()
+	raw, err, _ := c.sf.Do(key, func() (any, error) {
+		var cached T
+		if c.GetJSON(ctx, key, &cached) {
+			return cached, nil
+		}
+		val, err := fn()
+		if err != nil {
+			return val, err
+		}
+		c.SetJSON(ctx, key, val, ttl)
+		return val, nil
+	})
 	if err != nil {
 		return v, err
 	}
-	c.SetJSON(ctx, key, v, ttl)
-	return v, nil
+	return raw.(T), nil
 }
 
 // Allow implements a fixed-window rate limiter. Returns false when the limit is exceeded.

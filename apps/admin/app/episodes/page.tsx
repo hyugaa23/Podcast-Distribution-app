@@ -26,7 +26,7 @@ function EpisodesList() {
   const { run, busy } = useAction();
   const exp = useAction();
 
-  const podcasts = useAsync(() => list<Podcast>('/podcasts', { ...tq, sort: 'title', per_page: 200 }), [scopeTenantId]);
+  const podcasts = useAsync(() => list<Podcast>('/podcasts', { ...tq, sort: 'title', per_page: 100 }), [scopeTenantId]);
   const { data, error, loading, reload } = useAsync(
     () => list<Episode>('/episodes', { ...tq, podcast_id: podcast, status, q, page, per_page: 25 }),
     [scopeTenantId, podcast, status, q, page],

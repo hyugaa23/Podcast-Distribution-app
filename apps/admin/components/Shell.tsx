@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import type { Role } from '@/lib/api';
@@ -50,17 +50,30 @@ const NAV: NavGroup[] = [
 ];
 
 function NotificationsBell() {
+  const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState<Notification[]>([]);
   const [unread, setUnread] = useState(0);
-  const load = () => get<{ items: Notification[]; unread: number }>('/notifications').then((d) => { setItems(d.items); setUnread(d.unread); }).catch(() => {});
+  const panelRef = useRef<HTMLDivElement>(null);
+  const load = useCallback(() => {
+    if (!user) return;
+    get<{ items: Notification[]; unread: number }>('/notifications').then((d) => { setItems(d.items); setUnread(d.unread); }).catch(() => {});
+  }, [user]);
   useEffect(() => {
     load();
     const t = setInterval(load, 30_000);
     return () => clearInterval(t);
-  }, []);
+  }, [load]);
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: MouseEvent) => {
+      if (panelRef.current && !panelRef.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [open]);
   return (
-    <div className="bell">
+    <div className="bell" ref={panelRef}>
       <button type="button" className="icon-btn" aria-label={`Notifications (${unread} unread)`} aria-expanded={open} onClick={() => setOpen((o) => !o)}>
         <Icon name="bell" />{unread > 0 && <span className="bell__count">{unread > 99 ? '99+' : unread}</span>}
       </button>
@@ -135,7 +148,7 @@ export function Shell({ children }: { children: ReactNode }) {
               <span className="sr-only">Tenant scope</span>
               <select value={scopeTenantId ?? ''} onChange={(e) => { setScopeTenantId(e.target.value ? Number(e.target.value) : null); router.refresh(); }}>
                 <option value="">All Network</option>
-                {tenants.map((t) => <option key={t.id} value={t.id}>{t.name} — {t.primary_domain || t.slug}</option>)}
+                {tenants.map((t) => <option key={t.id} value={t.id}>{t.is_demo ? '[Demo] ' : ''}{t.name} — {t.primary_domain || t.slug}</option>)}
               </select>
             </label>
           ) : (

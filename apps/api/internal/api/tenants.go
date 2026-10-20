@@ -785,6 +785,8 @@ func (s *Server) createUser(w http.ResponseWriter, r *http.Request) {
 	if in.PodcastIDs != nil {
 		s.setUserPodcasts(r.Context(), id, in.TenantID, *in.PodcastIDs)
 	}
+	s.App.Log.Info("new user created — share credentials manually (email service not configured)",
+		"user_id", id, "email", *in.Email, "role", *in.Role)
 	in.Password = nil
 	s.audit(r, "CREATED_USER", "user", id, in.TenantID, in)
 	s.writeUser(w, r, id, http.StatusCreated)

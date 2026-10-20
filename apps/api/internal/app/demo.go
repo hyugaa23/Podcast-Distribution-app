@@ -112,6 +112,7 @@ func (a *App) SeedDemo(ctx context.Context) error {
 			return fmt.Errorf("tenant %s: %w", dt.Slug, err)
 		}
 		tenantIDs[dt.Slug] = id
+		a.DB.Exec(ctx, `UPDATE tenants SET is_demo = true WHERE id = $1`, id)
 		a.DB.Exec(ctx, `UPDATE tenant_settings SET branding = branding || jsonb_build_object('tagline', $2::text,
 			'social_links', jsonb_build_object('x','https://x.com/'||$3::text,'instagram','https://instagram.com/'||$3::text)) WHERE tenant_id=$1`,
 			id, dt.Tagline, dt.Slug)
@@ -328,13 +329,13 @@ func (a *App) demoDistribution(ctx context.Context, rnd *rand.Rand, podcasts []i
 			switch {
 			case i >= 9:
 				status = []string{"NOT_STARTED", "READY", "SUBMITTED"}[rnd.Intn(3)]
-			case p.key == "amazon-music":
+			case p.key == "amazon" || p.key == "amazon-music":
 				status = "PENDING"
 			case p.key == "tunein" && pid%3 == 0:
 				status = "ACTION_REQUIRED"
 			case p.key == "deezer" && pid%4 == 0:
 				status = "FAILED"
-			case p.key == "podcast-index":
+			case p.key == "podcastindex" || p.key == "podcast-index":
 				status = "SUBMITTED"
 			}
 			if status == "NOT_STARTED" {

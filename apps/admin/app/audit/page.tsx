@@ -1,9 +1,9 @@
 'use client';
 
 import { Fragment, useState } from 'react';
-import { list } from '@/lib/api';
+import { download, list } from '@/lib/api';
 import { useAuth, useTenantQuery } from '@/lib/auth';
-import { Button, Empty, ErrorBox, PageHeader, Pager, Spinner, fmtDate, useAsync } from '@/components/ui';
+import { Button, Empty, ErrorBox, PageHeader, Pager, Spinner, fmtDate, useAction, useAsync } from '@/components/ui';
 import { NoAccess } from '@/components/network/common';
 
 interface AuditEntry {
@@ -41,6 +41,7 @@ function hasChanges(c: unknown) {
 export default function AuditPage() {
   const { can, scopeTenantId } = useAuth();
   const tq = useTenantQuery();
+  const { run: runExport, busy: exporting } = useAction();
   const [page, setPage] = useState(1);
   const [action, setAction] = useState('');
   const [resource, setResource] = useState('');
@@ -55,7 +56,10 @@ export default function AuditPage() {
 
   return (
     <>
-      <PageHeader title="Audit log" subtitle="Who changed what, where and when" actions={<Button onClick={reload} loading={loading && !!data}>Refresh</Button>} />
+      <PageHeader title="Audit log" subtitle="Who changed what, where and when" actions={<>
+        <Button loading={exporting} onClick={() => runExport(() => download('/exports/audit', 'audit.csv', tq), 'Audit log exported')}>⇩ Export CSV</Button>
+        <Button onClick={reload} loading={loading && !!data}>Refresh</Button>
+      </>} />
       <form className="row" style={{ marginBottom: 12 }} onSubmit={(e) => { e.preventDefault(); setAction(draft.trim().toUpperCase()); setPage(1); }}>
         <label><span className="sr-only">Action</span>
           <input className="input" list="audit-actions" placeholder="Action, e.g. UPDATED_EPISODE" value={draft} onChange={(e) => setDraft(e.target.value)} style={{ width: 260 }} />

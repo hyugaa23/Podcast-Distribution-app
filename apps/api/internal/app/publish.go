@@ -63,9 +63,9 @@ func (a *App) ScheduleEpisode(ctx context.Context, episodeID int64, at time.Time
 	if err := a.DB.QueryRow(ctx, `SELECT status, COALESCE(audio_url,''), audio_file_id FROM episodes WHERE id=$1`, episodeID).Scan(&status, &audioURL, &audioFileID); err != nil {
 		return err
 	}
-	// Only DRAFT or PROCESSING episodes can be scheduled.
+	// DRAFT, PROCESSING or already SCHEDULED episodes can be (re)scheduled.
 	switch status {
-	case EpisodeDraft, EpisodeProcessing:
+	case EpisodeDraft, EpisodeProcessing, EpisodeScheduled:
 		// allowed
 	case EpisodePublished:
 		return fmt.Errorf("cannot schedule a published episode; unpublish it first")

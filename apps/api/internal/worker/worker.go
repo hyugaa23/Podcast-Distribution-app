@@ -78,6 +78,16 @@ var handlers = map[string]handler{
 		}
 		return a.RefreshDistribution(ctx, p.DistributionID)
 	},
+	queue.SubmitDistribution: func(ctx context.Context, a *app.App, j *queue.Job) error {
+		p, err := payload[struct {
+			PodcastID  int64 `json:"podcast_id"`
+			PlatformID int64 `json:"platform_id"`
+		}](j)
+		if err != nil {
+			return err
+		}
+		return a.SubmitDistribution(ctx, p.PodcastID, p.PlatformID)
+	},
 	queue.GenerateSitemap: func(ctx context.Context, a *app.App, j *queue.Job) error {
 		p, err := payload[struct {
 			TenantID int64 `json:"tenant_id"`

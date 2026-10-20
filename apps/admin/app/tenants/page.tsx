@@ -36,7 +36,7 @@ export default function TenantsPage() {
             <tbody>
               {data.map((t) => (
                 <tr key={t.id}>
-                  <td><a className="cell-title" href={`/tenants/${t.id}`}>{t.name}</a><div className="small muted mono">{t.slug}</div></td>
+                  <td><a className="cell-title" href={`/tenants/${t.id}`}>{t.name}</a>{t.is_demo && <span className="badge badge--muted" style={{ marginLeft: 6, fontSize: 10 }}>Demo</span>}<div className="small muted mono">{t.slug}</div></td>
                   <td>{t.primary_domain ? <a href={siteUrl(t.primary_domain)} target="_blank" rel="noopener noreferrer">{siteUrl(t.primary_domain)} ↗</a> : <span className="muted">No domain</span>}</td>
                   <td>{t.theme_name}</td>
                   <td>{CONTENT_MODES.find((m) => m.value === t.content_mode)?.label ?? t.content_mode}</td>

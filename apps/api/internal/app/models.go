@@ -57,13 +57,14 @@ type Tenant struct {
 	Language      string    `json:"language" db:"language"`
 	Timezone      string    `json:"timezone" db:"timezone"`
 	Status        string    `json:"status" db:"status"`
+	IsDemo        bool      `json:"is_demo" db:"is_demo"`
 	PrimaryDomain string    `json:"primary_domain" db:"primary_domain"`
 	CreatedAt     time.Time `json:"created_at" db:"created_at"`
 	UpdatedAt     time.Time `json:"updated_at" db:"updated_at"`
 }
 
 const TenantSelect = `SELECT t.id, t.name, t.slug, t.theme_id, th.key AS theme_key, th.name AS theme_name,
-	t.content_mode, t.language, t.timezone, t.status,
+	t.content_mode, t.language, t.timezone, t.status, t.is_demo,
 	COALESCE((SELECT d.domain FROM domains d WHERE d.tenant_id=t.id AND d.is_primary LIMIT 1),
 	         (SELECT d.domain FROM domains d WHERE d.tenant_id=t.id ORDER BY d.id LIMIT 1), '') AS primary_domain,
 	t.created_at, t.updated_at

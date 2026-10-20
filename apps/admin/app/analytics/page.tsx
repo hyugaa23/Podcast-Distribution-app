@@ -21,7 +21,7 @@ export default function AnalyticsPage() {
   const { run, busy } = useAction();
   const isNetwork = can('SUPER_ADMIN') && !scopeTenantId;
 
-  const pods = useAsync(() => list<Podcast>('/podcasts', { ...tq, per_page: 100, sort: 'title' }), [scopeTenantId]);
+  const pods = useAsync(() => { setPodcastId(''); return list<Podcast>('/podcasts', { ...tq, per_page: 100, sort: 'title' }); }, [scopeTenantId]);
   const { data, error, loading, reload } = useAsync(
     () => get<AnalyticsSummary>('/analytics/summary', { ...tq, days, podcast_id: podcastId || undefined }),
     [scopeTenantId, days, podcastId],
@@ -62,6 +62,8 @@ export default function AnalyticsPage() {
       {tab === 'breakdown' && <BreakdownTab tq={tq} days={days} podcastId={podcastId || undefined} />}
 
       {isNetwork && tab === 'overview' && <div style={{ marginTop: 16 }}><NetworkComparison days={days} /></div>}
+
+      <p className="small muted" style={{ marginTop: 24 }}>Analytics are aggregated every 5 minutes. Unique visitors are counted per calendar day using anonymised session hashes. Data is retained for 13 months.</p>
     </>
   );
 }

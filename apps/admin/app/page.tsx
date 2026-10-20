@@ -78,8 +78,56 @@ function Master({ d }: { d: MasterDash }) {
           <BarList items={d.tenants.slice(0, 8).map((t) => ({ label: `${t.tenant_name}${t.domain ? ` · ${t.domain}` : ''}`, value: t.plays }))} />
         </Card>
       </div>
+      <div className="grid-3" style={{ marginTop: 16 }}>
+        <Card title="Growth snapshot">
+          <div className="stack" style={{ gap: 8 }}>
+            <Stat label="Avg plays / podcast" value={s.podcasts ? Math.round(s.plays / s.podcasts).toLocaleString() : '0'} />
+            <Stat label="Avg episodes / podcast" value={s.podcasts ? Math.round(s.episodes / s.podcasts).toLocaleString() : '0'} />
+            <Stat label="Platform coverage" value={`${s.distribution_live} live`} hint={`${s.distribution_pending + s.distribution_live} total submissions`} />
+          </div>
+        </Card>
+        <Card title="Content velocity">
+          <div className="stack" style={{ gap: 8 }}>
+            <Stat label="Episodes this month" value={(s.episodes_this_month ?? 0).toLocaleString()} />
+            <Stat label="New podcasts this month" value={(s.podcasts_this_month ?? 0).toLocaleString()} />
+          </div>
+        </Card>
+        <Card title="Engagement">
+          <div className="stack" style={{ gap: 8 }}>
+            <Stat label="Active websites" value={(s.active_tenants ?? s.tenants).toLocaleString()} hint="with plays in last 30 days" />
+            <Stat label="Completion rate" value={s.plays ? `${Math.round((s.completions ?? 0) / s.plays * 100)}%` : '—'} />
+          </div>
+        </Card>
+      </div>
       <div style={{ marginTop: 16 }}><RecentEpisodes items={d.recent_episodes} /></div>
     </>
+  );
+}
+
+function SetupChecklist({ s }: { s: Record<string, number> }) {
+  const steps = [
+    { done: s.podcasts > 0, label: 'Create your first podcast', href: '/podcasts/new' },
+    { done: s.episodes > 0, label: 'Publish an episode', href: '/episodes/new' },
+    { done: s.platforms > 0, label: 'Submit to at least one platform', href: '/distribution' },
+    { done: s.plays > 0, label: 'Get your first listen', href: '/analytics' },
+  ];
+  const completed = steps.filter((s) => s.done).length;
+  if (completed === steps.length) return null;
+  return (
+    <div style={{ marginBottom: 16 }}><Card title="Getting started">
+      <p className="small muted" style={{ marginBottom: 8 }}>{completed} of {steps.length} steps completed</p>
+      <div style={{ height: 6, borderRadius: 3, background: 'var(--surface-2, #e5e7eb)', marginBottom: 12 }}>
+        <div style={{ height: '100%', borderRadius: 3, background: 'var(--primary, #1457ff)', width: `${(completed / steps.length) * 100}%`, transition: 'width .3s' }} />
+      </div>
+      <ul className="checklist">
+        {steps.map((step, i) => (
+          <li key={i} style={{ opacity: step.done ? 0.6 : 1 }}>
+            <span style={{ marginRight: 8 }}>{step.done ? '✓' : '○'}</span>
+            {step.done ? <span>{step.label}</span> : <a href={step.href}>{step.label} →</a>}
+          </li>
+        ))}
+      </ul>
+    </Card></div>
   );
 }
 
@@ -90,6 +138,7 @@ function TenantView({ d }: { d: TenantDash }) {
   return (
     <>
       <PageHeader title={d.tenant_name} subtitle="Website dashboard" actions={<><a className="btn" href="/podcasts/new">+ New podcast</a><a className="btn btn--primary" href="/episodes/new">+ New episode</a></>} />
+      <SetupChecklist s={s} />
       <div className="grid-4" style={{ marginBottom: 16 }}>
         <Stat label="Podcasts" value={s.podcasts.toLocaleString()} href="/podcasts" />
         <Stat label="Episodes" value={s.episodes.toLocaleString()} href="/episodes" />

@@ -515,7 +515,7 @@ func TestE2E(t *testing.T) {
 	bvAdmin.must("POST", fmt.Sprintf("/api/distribution/%d/spotify", podID), map[string]any{"status": "LIVE", "external_url": "https://open.spotify.com/show/abc"}, nil, 200)
 	bvAdmin.must("POST", fmt.Sprintf("/api/distribution/%d/%s", podID, plat.Data.Key), map[string]any{"status": "LIVE", "external_id": "999"}, nil, 200)
 	bvAdmin.must("POST", fmt.Sprintf("/api/distribution/%d/tunein", podID), map[string]any{"status": "ACTION_REQUIRED", "issue_reason": "Artwork does not meet requirements."}, nil, 200)
-	bvAdmin.must("POST", fmt.Sprintf("/api/distribution/%d/amazon-music", podID), map[string]any{"status": "PENDING"}, nil, 200)
+	bvAdmin.must("POST", fmt.Sprintf("/api/distribution/%d/amazon", podID), map[string]any{"status": "PENDING"}, nil, 200)
 	bvAdmin.must("GET", fmt.Sprintf("/api/distribution/%d", podID), nil, &dist, 200)
 	if dist.Data.Live != 2 {
 		t.Fatalf("live count %d", dist.Data.Live)

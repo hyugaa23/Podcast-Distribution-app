@@ -56,6 +56,7 @@ type episodeInput struct {
 	Status           *string           `json:"status"` // DRAFT | PUBLISHED | ARCHIVED (scheduling via /schedule)
 	ClearEpisodeNum  bool              `json:"clear_episode_number"`
 	ClearSeasonNum   bool              `json:"clear_season_number"`
+	ClearPublishDate bool              `json:"clear_publish_date"`
 }
 
 func (in *episodeInput) normalize() string {
@@ -114,7 +115,7 @@ func (in *episodeInput) normalize() string {
 	if in.SeasonNumber != nil && *in.SeasonNumber < 0 {
 		return "Season number must not be negative"
 	}
-	if in.EpisodeNumber != nil && *in.EpisodeNumber > 99999 || in.SeasonNumber != nil && *in.SeasonNumber > 99999 {
+	if (in.EpisodeNumber != nil && *in.EpisodeNumber > 99999) || (in.SeasonNumber != nil && *in.SeasonNumber > 99999) {
 		return "Episode and season numbers must be under 100000"
 	}
 	if in.Status != nil {
@@ -485,7 +486,7 @@ func (s *Server) updateEpisode(w http.ResponseWriter, r *http.Request) {
 		episode_type=COALESCE($11,episode_type), artwork_url=COALESCE($12,artwork_url),
 		audio_url=COALESCE($13,audio_url), audio_size=COALESCE($14,audio_size), duration=COALESCE($15,duration),
 		audio_mime=COALESCE($16,audio_mime), audio_file_id=CASE WHEN $13 IS NOT NULL THEN NULL ELSE audio_file_id END,
-		published_at=COALESCE($17,published_at), explicit=COALESCE($18,explicit),
+		published_at=CASE WHEN $29 THEN NULL ELSE COALESCE($17,published_at) END, explicit=COALESCE($18,explicit),
 		transcript=COALESCE($19,transcript), transcript_format=COALESCE($20,transcript_format),
 		transcript_source=COALESCE($21,transcript_source), transcript_approved=COALESCE($22,transcript_approved),
 		seo_title=COALESCE($23,seo_title), meta_description=COALESCE($24,meta_description), canonical_url=COALESCE($25,canonical_url),
@@ -496,7 +497,8 @@ func (s *Server) updateEpisode(w http.ResponseWriter, r *http.Request) {
 		in.EpisodeType, in.ArtworkURL, in.AudioURL, in.AudioSize, in.Duration, mime, publishedAt, in.Explicit,
 		in.Transcript, in.TranscriptFormat, transcriptSource, in.TranscriptOK,
 		in.SEOTitle, in.MetaDescription, in.CanonicalURL,
-		jsonOrNil(in.KeyTopics, in.KeyTopics != nil), jsonOrNil(in.FAQ, in.FAQ != nil), jsonOrNil(in.Citations, in.Citations != nil))
+		jsonOrNil(in.KeyTopics, in.KeyTopics != nil), jsonOrNil(in.FAQ, in.FAQ != nil), jsonOrNil(in.Citations, in.Citations != nil),
+		in.ClearPublishDate)
 	if err != nil {
 		s.serverError(w, r, err)
 		return

@@ -23,7 +23,7 @@ export const SECTION_TYPES: { type: string; label: string; title: string; limit?
   { type: 'editors_picks', label: "Editor's Picks", title: "Editor's Picks", limit: 6 },
   { type: 'new_podcasts', label: 'New Podcasts', title: 'New Podcasts', limit: 8 },
   { type: 'collections', label: 'Collections', title: 'Collections', limit: 6 },
-  { type: 'newsletter', label: 'Newsletter', title: 'Get new episodes in your inbox' },
+  { type: 'newsletter', label: 'Follow / Social', title: 'Follow the show' },
   { type: 'cta', label: 'Call to action', title: 'Never miss an episode' },
 ];
 const HAS_LIMIT = new Set(SECTION_TYPES.filter((s) => s.limit).map((s) => s.type));
