@@ -15,16 +15,20 @@ export default async function CategoriesPage() {
   return (
     <PageShell title="Categories" lead={`Explore ${site.tenant.name} by topic.`}>
       <TrackMarker />
-      <ul className="pe-catgrid">
-        {cats.map((c) => (
-          <li key={c.id}>
-            <a href={`/category/${c.slug}`}>
-              <strong>{c.name}</strong>
-              <span>{plural(c.podcast_count, 'podcast')}</span>
-            </a>
-          </li>
-        ))}
-      </ul>
+      {cats.length === 0 ? (
+        <p className="pe-page__lead">No categories yet.</p>
+      ) : (
+        <ul className="pe-catgrid">
+          {cats.map((c) => (
+            <li key={c.id}>
+              <a href={`/category/${c.slug}`}>
+                <strong>{c.name}</strong>
+                <span>{plural(c.podcast_count, 'podcast')}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      )}
     </PageShell>
   );
 }

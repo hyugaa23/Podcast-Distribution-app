@@ -314,8 +314,19 @@ func decode(r *http.Request, dst any) error {
 }
 
 func idParam(r *http.Request, name string) int64 {
-	n, _ := strconv.ParseInt(chi.URLParam(r, name), 10, 64)
+	n, err := strconv.ParseInt(chi.URLParam(r, name), 10, 64)
+	if err != nil || n <= 0 {
+		return 0
+	}
 	return n
+}
+
+func requireID(w http.ResponseWriter, id int64) bool {
+	if id <= 0 {
+		badRequest(w, "invalid or missing resource ID")
+		return false
+	}
+	return true
 }
 
 func queryInt(r *http.Request, name string, def int) int {

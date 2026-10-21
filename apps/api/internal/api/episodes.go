@@ -546,13 +546,14 @@ func (s *Server) publishError(w http.ResponseWriter, r *http.Request, err error)
 
 func (s *Server) deleteEpisode(w http.ResponseWriter, r *http.Request) {
 	id := idParam(r, "id")
+	if !requireID(w, id) { return }
 	p := principal(r)
 	acc, podcastID, err := s.episodeAccess(r.Context(), p, id)
 	if err != nil {
 		s.serverError(w, r, err)
 		return
 	}
-	if !acc.Edit {
+	if !acc.Delete {
 		forbidden(w)
 		return
 	}

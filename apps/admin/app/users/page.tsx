@@ -33,7 +33,7 @@ function UserModal({ initial, onClose, onSaved }: { initial: Form; onClose: () =
   const roles = isSuper ? ROLES : ROLES.filter((r) => r.value !== 'SUPER_ADMIN');
   const needsTenant = f.role !== 'SUPER_ADMIN';
   const pwOk = editing ? !f.password || f.password.length >= 8 : f.password.length >= 8;
-  const valid = f.email.includes('@') && pwOk && (!isSuper || !needsTenant || !!f.tenant_id);
+  const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email) && pwOk && (!isSuper || !needsTenant || !!f.tenant_id);
 
   const save = async () => {
     const body: Record<string, unknown> = { name: f.name.trim(), email: f.email.trim(), role: f.role, status: f.status };

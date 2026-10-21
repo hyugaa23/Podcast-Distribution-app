@@ -105,7 +105,10 @@ export async function api<T = unknown>(path: string, opts: { method?: string; bo
   } catch {
     throw new ApiError(res.status, 'server_error', `Server returned ${res.status}`, text?.slice(0, 200));
   }
-  if (!res.ok) throw new ApiError(res.status, json.error ?? { code: 'error', message: res.statusText });
+  if (!res.ok) {
+    const err = json.error;
+    throw new ApiError(res.status, typeof err === 'object' && err?.code ? err : { code: err?.code ?? 'error', message: err?.message ?? res.statusText });
+  }
   return json as T;
 }
 

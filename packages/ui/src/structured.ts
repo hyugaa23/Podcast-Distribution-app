@@ -113,6 +113,6 @@ export function personLd(host: HostDetail, site: Site, podcasts: Podcast[]) {
     image: host.photo_url || undefined,
     description: strip(host.bio) || undefined,
     sameAs: [host.website_url, ...Object.values(host.social_links ?? {})].filter(Boolean),
-    ...(podcasts.length ? { workFor: undefined, subjectOf: podcasts.map((p) => seriesRef(p, site)) } : {}),
+    ...(podcasts.length ? { subjectOf: podcasts.map((p) => seriesRef(p, site)) } : {}),
   };
 }

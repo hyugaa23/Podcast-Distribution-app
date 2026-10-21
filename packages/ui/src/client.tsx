@@ -69,8 +69,17 @@ export function ShareButtons({ url, title, className }: { url: string; title: st
 export function SubscribeButton({ feedUrl, className, children }: { feedUrl: string; className?: string; children?: ReactNode }) {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false); };
+    const onClick = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
+    document.addEventListener('keydown', onKey);
+    document.addEventListener('mousedown', onClick);
+    return () => { document.removeEventListener('keydown', onKey); document.removeEventListener('mousedown', onClick); };
+  }, [open]);
   return (
-    <div className={`pe-subscribe ${className ?? ''}`}>
+    <div ref={ref} className={`pe-subscribe ${className ?? ''}`}>
       <button type="button" className="pe-subscribe__btn" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
         {children ?? 'Follow'}
       </button>
@@ -243,5 +252,11 @@ export function NowPlaying({ className, showArtwork = true }: { className?: stri
 /** Renders children only while a track is loaded (player bars hide when idle). */
 export function WhenPlaying({ children, fallback = null }: { children: ReactNode; fallback?: ReactNode }) {
   const p = usePlayer();
+  useEffect(() => {
+    const root = document.querySelector('.pe-root');
+    if (!root) return;
+    if (p.track) root.setAttribute('data-playing', 'true');
+    else root.removeAttribute('data-playing');
+  }, [p.track]);
   return <>{p.track ? children : fallback}</>;
 }

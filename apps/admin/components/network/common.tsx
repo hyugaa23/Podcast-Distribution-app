@@ -19,12 +19,7 @@ export const CONTENT_MODES: { value: Tenant['content_mode']; label: string; help
   { value: 'SYNDICATED', label: 'Syndicated', help: 'Podcasts can be published on several websites while keeping one source record.' },
 ];
 
-export const LANGUAGES = [
-  { value: 'en', label: 'English' }, { value: 'id', label: 'Indonesian' }, { value: 'es', label: 'Spanish' }, { value: 'pt', label: 'Portuguese' },
-  { value: 'fr', label: 'French' }, { value: 'de', label: 'German' }, { value: 'it', label: 'Italian' }, { value: 'nl', label: 'Dutch' },
-  { value: 'ja', label: 'Japanese' }, { value: 'ko', label: 'Korean' }, { value: 'zh', label: 'Chinese' }, { value: 'ar', label: 'Arabic' },
-  { value: 'hi', label: 'Hindi' }, { value: 'ms', label: 'Malay' }, { value: 'th', label: 'Thai' }, { value: 'vi', label: 'Vietnamese' },
-];
+export { LANGUAGES } from '../content/common';
 
 export const TIMEZONES = [
   'UTC', 'America/New_York', 'America/Chicago', 'America/Denver', 'America/Los_Angeles', 'America/Sao_Paulo', 'America/Mexico_City', 'America/Toronto',
@@ -119,14 +114,8 @@ export function TenantSelect({ tenants, value, onChange, label = 'Website', allo
   );
 }
 
-export function CopyButton({ text, label = 'Copy' }: { text: string; label?: string }) {
-  const toast = useToast();
-  return (
-    <Button size="sm" onClick={async () => {
-      try { await navigator.clipboard.writeText(text); toast('success', 'Copied to clipboard'); } catch { toast('error', 'Copy failed — select the text manually'); }
-    }}>{label}</Button>
-  );
-}
+import { CopyButton } from '@/components/distribution/shared';
+export { CopyButton };
 
 /** Secret shown once (API key / webhook secret). */
 export function SecretOnce({ value, title, children }: { value: string; title: string; children?: ReactNode }) {

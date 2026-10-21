@@ -57,7 +57,7 @@ function NotificationsBell() {
   const panelRef = useRef<HTMLDivElement>(null);
   const load = useCallback(() => {
     if (!user) return;
-    get<{ items: Notification[]; unread: number }>('/notifications').then((d) => { setItems(d.items); setUnread(d.unread); }).catch(() => {});
+    get<{ items: Notification[]; unread: number }>('/notifications').then((d) => { setItems(d.items); setUnread(d.unread); }).catch(() => { /* polling failure is non-critical */ });
   }, [user]);
   useEffect(() => {
     load();
@@ -156,7 +156,7 @@ export function Shell({ children }: { children: ReactNode }) {
           )}
           <div className="top__right">
             <NotificationsBell />
-            <span className="who"><strong>{user.name || user.email}</strong><small>{user.role.replace('_', ' ')}</small></span>
+            <span className="who"><strong>{user.name || user.email}</strong><small>{user.role.replaceAll('_', ' ')}</small></span>
             <Link className="btn btn--ghost btn--sm" href="/account"><Icon name="account" />Account</Link>
             <button type="button" className="btn btn--ghost btn--sm" onClick={async () => { await logout(); router.replace('/login'); }}><Icon name="logout" />Sign out</button>
           </div>

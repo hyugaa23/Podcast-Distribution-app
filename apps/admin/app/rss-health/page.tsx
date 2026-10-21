@@ -83,10 +83,13 @@ export default function RSSHealthPage() {
     } catch (e) { toast('error', errMsg(e)); return; }
     let failed = 0;
     setBulk({ done: 0, total: ids.length, failed: 0 });
-    for (let i = 0; i < ids.length; i++) {
+    const BATCH = 5;
+    for (let i = 0; i < ids.length; i += BATCH) {
       if (cancelRef.current) break;
-      if (!(await runCheck(ids[i]))) failed++;
-      setBulk({ done: i + 1, total: ids.length, failed });
+      const batch = ids.slice(i, i + BATCH);
+      const results = await Promise.all(batch.map((id) => runCheck(id)));
+      failed += results.filter((ok) => !ok).length;
+      setBulk({ done: Math.min(i + BATCH, ids.length), total: ids.length, failed });
     }
     toast(failed ? 'error' : 'success', cancelRef.current ? 'Health check cancelled' : `Checked ${ids.length} feed(s)${failed ? `, ${failed} failed` : ''}`);
     setBulk(null);

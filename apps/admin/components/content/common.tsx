@@ -15,7 +15,7 @@ export const LANGUAGES: { value: string; label: string }[] = [
   { value: 'en', label: 'English' }, { value: 'id', label: 'Indonesian' }, { value: 'es', label: 'Spanish' }, { value: 'fr', label: 'French' },
   { value: 'de', label: 'German' }, { value: 'pt', label: 'Portuguese' }, { value: 'it', label: 'Italian' }, { value: 'nl', label: 'Dutch' },
   { value: 'ja', label: 'Japanese' }, { value: 'ko', label: 'Korean' }, { value: 'zh', label: 'Chinese' }, { value: 'ar', label: 'Arabic' },
-  { value: 'hi', label: 'Hindi' }, { value: 'ms', label: 'Malay' },
+  { value: 'hi', label: 'Hindi' }, { value: 'ms', label: 'Malay' }, { value: 'th', label: 'Thai' }, { value: 'vi', label: 'Vietnamese' },
 ];
 
 export type HostLink = { host_id: number; role: string };

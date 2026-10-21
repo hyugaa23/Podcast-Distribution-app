@@ -53,7 +53,10 @@ func (s *Server) tenantFromHost(next http.Handler) http.Handler {
 	})
 }
 
-func tenantOf(r *http.Request) *tenantCtx { return r.Context().Value(tenantKey).(*tenantCtx) }
+func tenantOf(r *http.Request) *tenantCtx {
+	tc, _ := r.Context().Value(tenantKey).(*tenantCtx)
+	return tc
+}
 
 func cacheKey(tid int64, parts ...any) string {
 	return fmt.Sprintf("t:%d:%s", tid, strings.Trim(fmt.Sprint(parts...), "[]"))

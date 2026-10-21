@@ -13,7 +13,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function CollectionsPage() {
   const [site, cols] = await Promise.all([getSite(), listCollections()]);
   return (
-    <PageShell title="Collections" lead="Hand-picked lists from our editors.">
+    <PageShell title="Collections" lead={`Curated podcast collections from ${site.tenant.name}.`}>
       <TrackMarker />
       {cols.length === 0 && <EmptyState>No collections yet.</EmptyState>}
       {cols.map((c) => (

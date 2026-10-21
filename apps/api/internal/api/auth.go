@@ -393,7 +393,10 @@ func (s *Server) changePassword(w http.ResponseWriter, r *http.Request) {
 		badRequest(w, err.Error())
 		return
 	}
-	s.App.DB.Exec(r.Context(), `UPDATE users SET password_hash=$2, updated_at=now() WHERE id=$1`, p.UserID, nh)
+	if _, err = s.App.DB.Exec(r.Context(), `UPDATE users SET password_hash=$2, updated_at=now() WHERE id=$1`, p.UserID, nh); err != nil {
+		s.serverError(w, r, err)
+		return
+	}
 	s.App.DB.Exec(r.Context(), `UPDATE refresh_tokens SET revoked_at=now() - interval '1 minute' WHERE user_id=$1 AND revoked_at IS NULL`, p.UserID)
 	s.audit(r, "CHANGED_PASSWORD", "user", p.UserID, p.TenantID, nil)
 	writeData(w, map[string]bool{"ok": true})
@@ -413,19 +416,24 @@ func (s *Server) forgotPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	email := strings.ToLower(strings.TrimSpace(in.Email))
-	writeData(w, map[string]string{"message": "If that email exists, a reset link has been generated."})
 
 	var userID int64
 	if err := s.App.DB.QueryRow(r.Context(), `SELECT id FROM users WHERE email=$1 AND status='ACTIVE'`, email).Scan(&userID); err != nil {
+		writeData(w, map[string]string{"message": "If that email exists, a reset link has been generated."})
 		return
 	}
 	s.App.DB.Exec(r.Context(), `UPDATE password_reset_tokens SET used_at=now() WHERE user_id=$1 AND used_at IS NULL`, userID)
 	token := util.RandomHex(32)
-	s.App.DB.Exec(r.Context(), `INSERT INTO password_reset_tokens(user_id, token_hash, expires_at) VALUES ($1,$2,$3)`,
-		userID, hashToken(token), time.Now().Add(1*time.Hour))
+	if _, err := s.App.DB.Exec(r.Context(), `INSERT INTO password_reset_tokens(user_id, token_hash, expires_at) VALUES ($1,$2,$3)`,
+		userID, hashToken(token), time.Now().Add(1*time.Hour)); err != nil {
+		s.App.Log.Error("failed to create password reset token", "email", email, "err", err)
+		writeData(w, map[string]string{"message": "If that email exists, a reset link has been generated."})
+		return
+	}
 	resetURL := fmt.Sprintf("/reset-password?token=%s", token)
 	s.App.SysLog(r.Context(), "info", "auth", fmt.Sprintf("Password reset requested for %s", email), resetURL, nil)
 	s.App.Log.Info("password reset token generated", "email", email, "url", resetURL)
+	writeData(w, map[string]string{"message": "If that email exists, a reset link has been generated."})
 }
 
 func (s *Server) resetPassword(w http.ResponseWriter, r *http.Request) {

@@ -444,7 +444,7 @@ func (s *Server) updateCollection(w http.ResponseWriter, r *http.Request) {
 		notFound(w)
 		return
 	}
-	if !canAccessTenant(principal(r), tid) {
+	if !canManageTenant(principal(r), tid) {
 		forbidden(w)
 		return
 	}
@@ -496,7 +496,7 @@ func (s *Server) deleteCollection(w http.ResponseWriter, r *http.Request) {
 		notFound(w)
 		return
 	}
-	if !canAccessTenant(principal(r), tid) {
+	if !canManageTenant(principal(r), tid) {
 		forbidden(w)
 		return
 	}

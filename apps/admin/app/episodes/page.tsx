@@ -68,7 +68,7 @@ function EpisodesList() {
         </Field>
         <Button type="submit">Search</Button>
         <Select label="Podcast" value={podcast} onChange={(e) => { setPodcast(e.target.value); resetPage(); }}
-          options={[{ value: '', label: podcasts.loading ? 'Loading…' : 'All podcasts' }, ...(podcasts.data?.data ?? []).map((p) => ({ value: p.id, label: p.title }))]} />
+          options={[{ value: '', label: podcasts.loading ? 'Loading…' : `All podcasts${(podcasts.data?.meta?.total ?? 0) > 100 ? ` (showing first 100 of ${podcasts.data?.meta?.total})` : ''}` }, ...(podcasts.data?.data ?? []).map((p) => ({ value: p.id, label: p.title }))]} />
         <Select label="Status" value={status} onChange={(e) => { setStatus(e.target.value); resetPage(); }}
           options={[{ value: '', label: 'All statuses' }, ...EPISODE_STATUSES.map((s) => ({ value: s, label: s[0] + s.slice(1).toLowerCase() }))]} />
       </form>

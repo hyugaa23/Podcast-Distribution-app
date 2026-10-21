@@ -150,3 +150,11 @@ h1, h2, h3, h4 { overflow-wrap: anywhere; }
 .pe-preview-banner { position: sticky; top: 0; z-index: 60; background: #fde68a; color: #111; text-align: center; padding: 8px 12px; font-size: .9rem; }
 .pe-search--page { max-width: 560px; }
 .pe-search--page input { padding: 12px 16px; font-size: 1.05rem; }
+
+/* Print */
+@media print {
+  .pe-root { padding-bottom: 0; }
+  .pe-root nav, .pe-root footer, .pe-skip, .pe-subscribe, .pe-share, .pe-preview-banner, [data-playing] { display: none !important; }
+  a[href]::after { content: ' (' attr(href) ')'; font-size: .8em; color: #666; }
+  .pe-prose a[href]::after { content: none; }
+}

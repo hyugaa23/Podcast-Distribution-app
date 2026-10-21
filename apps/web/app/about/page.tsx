@@ -15,7 +15,7 @@ export default async function AboutPage() {
   return (
     <PageShell title={`About ${site.tenant.name}`} lead={site.branding.tagline}>
       <TrackMarker />
-      <Prose html={site.about_content} />
+      {site.about_content ? <Prose html={site.about_content} /> : <p className="pe-page__lead">More information coming soon.</p>}
       <SocialLinks links={site.branding.social_links} />
     </PageShell>
   );

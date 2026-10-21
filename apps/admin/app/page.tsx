@@ -58,7 +58,7 @@ function Master({ d }: { d: MasterDash }) {
         <Stat label="Total domains" value={s.domains} href="/domains" />
         <Stat label="Total podcasts" value={s.podcasts} href="/podcasts" />
         <Stat label="Total episodes" value={s.episodes} href="/episodes" />
-        <Stat label="Total plays" value={s.plays.toLocaleString()} href="/analytics" />
+        <Stat label="Total plays" value={(s.plays ?? 0).toLocaleString()} href="/analytics" />
         <Stat label="Storage used" value={fmtBytes(s.storage_bytes)} href="/system" />
         <Stat label="Distribution live" value={s.distribution_live} href="/distribution?status=LIVE" />
         <Stat label="Distribution pending" value={s.distribution_pending} hint={`${s.distribution_issues} need attention`} href="/distribution?status=PENDING" />
@@ -140,10 +140,10 @@ function TenantView({ d }: { d: TenantDash }) {
       <PageHeader title={d.tenant_name} subtitle="Website dashboard" actions={<><a className="btn" href="/podcasts/new">+ New podcast</a><a className="btn btn--primary" href="/episodes/new">+ New episode</a></>} />
       <SetupChecklist s={s} />
       <div className="grid-4" style={{ marginBottom: 16 }}>
-        <Stat label="Podcasts" value={s.podcasts.toLocaleString()} href="/podcasts" />
-        <Stat label="Episodes" value={s.episodes.toLocaleString()} href="/episodes" />
-        <Stat label="Plays" value={s.plays.toLocaleString()} href="/analytics" />
-        <Stat label="Platforms" value={s.platforms} hint="with at least one live show" href="/distribution" />
+        <Stat label="Podcasts" value={(s.podcasts ?? 0).toLocaleString()} href="/podcasts" />
+        <Stat label="Episodes" value={(s.episodes ?? 0).toLocaleString()} href="/episodes" />
+        <Stat label="Plays" value={(s.plays ?? 0).toLocaleString()} href="/analytics" />
+        <Stat label="Platforms" value={s.platforms ?? 0} hint="with at least one live show" href="/distribution" />
       </div>
       <div className="grid-2">
         <Card title="Distribution" actions={<a href="/distribution">Manage →</a>}>
