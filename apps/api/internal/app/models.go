@@ -72,6 +72,7 @@ const TenantSelect = `SELECT t.id, t.name, t.slug, t.theme_id, th.key AS theme_k
 
 type Branding struct {
 	LogoURL         string            `json:"logo_url"`
+	IconURL         string            `json:"icon_url"`
 	FaviconURL      string            `json:"favicon_url"`
 	PrimaryColor    string            `json:"primary_color"`
 	SecondaryColor  string            `json:"secondary_color"`

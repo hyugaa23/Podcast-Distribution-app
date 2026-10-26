@@ -214,6 +214,7 @@ func (s *Server) Router() http.Handler {
 
 			r.Get("/notifications", s.listNotifications)
 			r.Post("/notifications/read-all", s.readAllNotifications)
+			r.Post("/notifications/clear-all", s.clearAllNotifications)
 			r.Post("/notifications/{id}/read", s.readNotification)
 
 			r.With(s.requireRoles(roleSuper, roleTenantAdmin)).Get("/audit-logs", s.listAuditLogs)

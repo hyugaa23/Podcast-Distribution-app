@@ -758,6 +758,18 @@ func (s *Server) readAllNotifications(w http.ResponseWriter, r *http.Request) {
 	writeData(w, map[string]bool{"ok": true})
 }
 
+func (s *Server) clearAllNotifications(w http.ResponseWriter, r *http.Request) {
+	p := principal(r)
+	if p.IsSuper() {
+		s.App.DB.Exec(r.Context(), `DELETE FROM notification_reads WHERE notification_id IN (SELECT id FROM notifications)`)
+		s.App.DB.Exec(r.Context(), `DELETE FROM notifications`)
+	} else {
+		s.App.DB.Exec(r.Context(), `DELETE FROM notification_reads WHERE notification_id IN (SELECT id FROM notifications WHERE tenant_id=$1)`, p.Tenant())
+		s.App.DB.Exec(r.Context(), `DELETE FROM notifications WHERE tenant_id=$1`, p.Tenant())
+	}
+	writeData(w, map[string]bool{"ok": true})
+}
+
 // ---------------------------------------------------------------------------
 // Audit log (PRD §78)
 

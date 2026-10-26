@@ -72,11 +72,14 @@ function Layout({ site, children }: LayoutProps) {
       <header className="tb-header" data-nav>
         <div className="tb-header__inner">
           <a href="/" className="tb-brand" aria-label={`${name} home`}>
+            {site.branding.icon_url
+              // eslint-disable-next-line @next/next/no-img-element
+              ? <img src={site.branding.icon_url} alt="" className="tb-brand__icon" />
+              : <span className="tb-brand__mark" aria-hidden="true">{name.slice(0, 1)}</span>}
             {site.branding.logo_url
               // eslint-disable-next-line @next/next/no-img-element
               ? <img src={site.branding.logo_url} alt={name} className="tb-brand__logo" />
-              : <span className="tb-brand__mark" aria-hidden="true">{name.slice(0, 1)}</span>}
-            <span className="tb-brand__name">{name}</span>
+              : <span className="tb-brand__name">{name}</span>}
           </a>
           <nav aria-label="Main" className="tb-nav">
             <ul>

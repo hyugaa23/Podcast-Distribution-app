@@ -82,6 +82,7 @@ function NotificationsBell() {
           <div className="bell__head">
             <strong>Notifications</strong>
             <button type="button" className="link" onClick={async () => { await post('/notifications/read-all'); load(); }}>Mark all read</button>
+            <button type="button" className="link" style={{ color: 'var(--red)' }} onClick={async () => { await post('/notifications/clear-all'); load(); }}>Clear all</button>
           </div>
           <ul>
             {items.length === 0 && <li className="muted">No notifications</li>}
@@ -122,7 +123,7 @@ export function Shell({ children }: { children: ReactNode }) {
     <div className={cx('shell', navOpen && 'nav-open')}>
       <Link className="skip" href="#content">Skip to content</Link>
       <aside className="side">
-        <div className="side__brand"><BrandMark /><div><strong>Podcast Engine</strong><small>{isSuper ? 'Master Admin' : myTenant?.name ?? 'Tenant Admin'}</small></div></div>
+        <div className="side__brand" style={{ flexDirection: 'column', alignItems: 'center', gap: 4, padding: '4px 8px' }}>{/* eslint-disable-next-line @next/next/no-img-element */}<img src="https://api.podcastdistribution.net/media/images/logo-podcast-engine.png" alt="Podcast Engine" style={{ width: '100%', maxWidth: 200, height: 'auto' }} /><small style={{ opacity: 0.6, fontSize: 11 }}>{isSuper ? 'Master Admin' : myTenant?.name ?? 'Tenant Admin'}</small></div>
         <nav aria-label="Admin">
           {NAV.map((g) => {
             const items = g.items.filter(visible);

@@ -32,6 +32,7 @@ export interface ThemeConfig {
 
 export interface Branding {
   logo_url: string;
+  icon_url: string;
   favicon_url: string;
   primary_color: string;
   secondary_color: string;

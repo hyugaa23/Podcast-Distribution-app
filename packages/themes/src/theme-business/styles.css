@@ -52,7 +52,7 @@
 
 /* ------------------------------------------------------------------ Header */
 .t-business .tb-header { position: sticky; top: 0; z-index: 40; background: var(--c-bg); border-bottom: 1px solid var(--tb-line); }
-.t-business .tb-header__inner { width: min(var(--tb-w), 100% - 32px); margin-inline: auto; min-height: 64px; display: flex; align-items: center; gap: 24px; }
+.t-business .tb-header__inner { width: min(var(--tb-w), 100% - 32px); margin-inline: auto; min-height: 80px; display: flex; align-items: center; gap: 24px; padding: 8px 0; }
 .t-business .tb-brand { display: flex; align-items: center; gap: 10px; font-family: var(--font-heading); font-weight: 700; font-size: 1.08rem; letter-spacing: -.02em; flex: none; min-width: 0; }
 .t-business .tb-brand__mark { width: 32px; height: 32px; border-radius: calc(var(--radius) * .75); display: grid; place-items: center; background: var(--c-primary); color: var(--c-on-primary); font-weight: 800; flex: none; }
 .t-business .tb-brand__logo { height: 32px; width: auto; }
@@ -462,3 +462,55 @@
   .t-business .tb-card__art { width: 84px; }
   .t-business .tb-card__body { padding: 0 0 0 10px; }
 }
+
+/* ------------------------------------------------------------------ Professional polish */
+.t-business { scroll-behavior: smooth; }
+
+/* Glassmorphism header */
+.t-business .tb-header { background: color-mix(in srgb, var(--c-bg) 82%, transparent); backdrop-filter: blur(16px) saturate(1.8); -webkit-backdrop-filter: blur(16px) saturate(1.8); border-bottom-color: color-mix(in srgb, var(--c-text) 8%, transparent); }
+
+/* Brand: icon + wordmark logo */
+.t-business .tb-brand__icon { height: 40px; width: 40px; border-radius: 0; object-fit: contain; flex: none; }
+.t-business .tb-brand__logo { height: 34px; width: auto; max-width: 220px; object-fit: contain; }
+.t-business .tb-brand__name { font-family: var(--font-heading); font-weight: 800; font-size: 1.25rem; letter-spacing: -.03em; background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 45%, #38bdf8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; white-space: nowrap; }
+
+/* Smooth entrance for hero content */
+@keyframes tb-fadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+.t-business .tb-hero__copy { animation: tb-fadeUp .7s ease-out both; }
+.t-business .tb-hero__stack { animation: tb-fadeUp .7s .15s ease-out both; }
+.t-business .tb-hero__topics { animation: tb-fadeUp .7s .3s ease-out both; }
+
+/* Enhanced card hover — lift + glow */
+.t-business .tb-card__link { transition: box-shadow .22s ease, border-color .22s ease, transform .22s ease; }
+.t-business .tb-card__link:hover { transform: translateY(-3px); box-shadow: 0 12px 32px -8px rgba(15, 23, 42, .18), 0 0 0 1px color-mix(in srgb, var(--c-primary) 15%, transparent); }
+
+/* Section divider — subtle gradient line */
+.t-business .tb-section + .tb-section { padding-top: 56px; border-top: 1px solid var(--tb-line); }
+.t-business .tb-section + .tb-section::before { content: ''; display: block; width: 48px; height: 3px; border-radius: 2px; background: linear-gradient(90deg, var(--c-primary), color-mix(in srgb, var(--c-primary) 30%, transparent)); margin: -28px 0 28px; }
+
+/* Premium button glow on hero */
+.t-business .tb-hero .tb-btn--primary { transition: background .2s, box-shadow .3s, transform .2s; }
+.t-business .tb-hero .tb-btn--primary:hover { transform: translateY(-1px); box-shadow: 0 14px 36px -8px color-mix(in srgb, var(--c-primary) 80%, transparent); }
+
+/* Rank list hover highlight */
+.t-business .tb-rank li { transition: background .15s ease; }
+
+/* Episode row hover — left accent */
+.t-business .tb-ep { transition: background .15s ease, box-shadow .15s ease; position: relative; }
+.t-business .tb-ep::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--c-primary); border-radius: 0 2px 2px 0; opacity: 0; transition: opacity .15s ease; }
+.t-business .tb-ep:hover::before { opacity: 1; }
+
+/* Footer — subtle top gradient instead of plain border */
+.t-business .tb-footer { border-top: none; background: linear-gradient(180deg, var(--c-surface) 0%, color-mix(in srgb, var(--c-surface) 92%, var(--c-primary)) 100%); }
+.t-business .tb-footer::before { content: ''; display: block; height: 2px; background: linear-gradient(90deg, transparent, var(--c-primary), transparent); }
+
+/* KPI numbers — subtle color */
+.t-business .tb-hero .tb-kpis dd { background: linear-gradient(135deg, #fff 30%, color-mix(in srgb, var(--c-primary) 40%, #fff)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+/* Topic tile hover — smooth lift */
+.t-business .tb-topics a { transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease; }
+.t-business .tb-topics a:hover { transform: translateY(-2px); }
+
+/* CTA section — breathing glow animation */
+@keyframes tb-ctaGlow { 0%, 100% { opacity: .6; } 50% { opacity: 1; } }
+.t-business .tb-cta::before { animation: tb-ctaGlow 4s ease-in-out infinite; }
